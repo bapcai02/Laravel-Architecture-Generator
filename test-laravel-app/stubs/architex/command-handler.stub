@@ -1,0 +1,34 @@
+<?php
+
+namespace {{namespace}};
+
+use {{command_namespace}}\{{command_name}};
+
+class {{class_name}}
+{
+    /**
+     * Handle the command.
+     */
+    public function handle({{command_name}} $command): mixed
+    {
+        // TODO: Implement command handling logic
+        
+        // Example implementation:
+        // $data = $command->data;
+        // $result = $this->processCommand($data);
+        // 
+        // return $result;
+        
+        return null;
+    }
+
+    /**
+     * Process the command data.
+     */
+    protected function processCommand(array $data): mixed
+    {
+        // TODO: Add your business logic here
+        
+        return null;
+    }
+} 

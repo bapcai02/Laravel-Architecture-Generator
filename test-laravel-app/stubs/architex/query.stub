@@ -1,0 +1,25 @@
+<?php
+
+namespace {{namespace}};
+
+class {{class_name}}
+{
+    public function __construct(
+        public readonly ?int $id = null,
+        public readonly array $filters = [],
+        public readonly array $sort = []
+    ) {
+    }
+
+    /**
+     * Get the query parameters as an array.
+     */
+    public function toArray(): array
+    {
+        return [
+            'id' => $this->id,
+            'filters' => $this->filters,
+            'sort' => $this->sort,
+        ];
+    }
+} 

@@ -1,0 +1,36 @@
+<?php
+
+namespace {{namespace}};
+
+use {{event_namespace}}\{{event_name}};
+
+class {{class_name}}
+{
+    /**
+     * Create the event listener.
+     */
+    public function __construct()
+    {
+        //
+    }
+
+    /**
+     * Handle the event.
+     */
+    public function handle({{event_name}} $event): void
+    {
+        // TODO: Implement event handling logic
+        
+        // Example implementation:
+        // $data = $event->data;
+        // $this->processEvent($data);
+    }
+
+    /**
+     * Process the event data.
+     */
+    protected function processEvent(mixed $data): void
+    {
+        // TODO: Add your event processing logic here
+    }
+} 

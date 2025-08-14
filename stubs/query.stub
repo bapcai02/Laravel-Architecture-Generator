@@ -1,0 +1,56 @@
+<?php
+
+namespace {{namespace}};
+
+class {{class_name}}
+{
+    protected $id;
+    protected $filters;
+    protected $sort;
+
+    public function __construct(
+        ?int $id = null,
+        array $filters = [],
+        array $sort = []
+    ) {
+        $this->id = $id;
+        $this->filters = $filters;
+        $this->sort = $sort;
+    }
+
+    /**
+     * Get the query parameters as an array.
+     */
+    public function toArray(): array
+    {
+        return [
+            'id' => $this->id,
+            'filters' => $this->filters,
+            'sort' => $this->sort,
+        ];
+    }
+
+    /**
+     * Get id
+     */
+    public function getId(): ?int
+    {
+        return $this->id;
+    }
+
+    /**
+     * Get filters
+     */
+    public function getFilters(): array
+    {
+        return $this->filters;
+    }
+
+    /**
+     * Get sort
+     */
+    public function getSort(): array
+    {
+        return $this->sort;
+    }
+} 

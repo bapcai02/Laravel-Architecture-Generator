@@ -1,0 +1,126 @@
+name: Tests
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    
+    strategy:
+      matrix:
+        php: [8.1, 8.2, 8.3]
+        laravel: [10.*, 11.*]
+        dependency-version: [prefer-stable]
+    
+    name: P${{ matrix.php }} - L${{ matrix.laravel }} - ${{ matrix.dependency-version }}
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup PHP
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: ${{ matrix.php }}
+        extensions: mbstring, xml, ctype, iconv, intl, pdo_sqlite
+        coverage: xdebug
+        
+    - name: Install dependencies
+      run: |
+        composer require "laravel/framework:${{ matrix.laravel }}" --no-interaction --no-update
+        composer update --${{ matrix.dependency-version }} --prefer-dist --no-interaction
+        
+    - name: Execute tests (via PHPUnit)
+      run: vendor/bin/phpunit --coverage-clover=coverage.xml
+      
+    - name: Upload coverage to Codecov
+      uses: codecov/codecov-action@v3
+      with:
+        file: ./coverage.xml
+        flags: unittests
+        name: codecov-umbrella
+        fail_ci_if_error: true
+        
+  test-commands:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup PHP
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: 8.2
+        extensions: mbstring, xml, ctype, iconv, intl, pdo_sqlite
+        
+    - name: Install dependencies
+      run: composer install --prefer-dist --no-interaction
+      
+    - name: Create Laravel test application
+      run: |
+        composer create-project laravel/laravel test-app --prefer-dist
+        cd test-app
+        composer require ../ --prefer-dist
+        
+    - name: Test Artisan commands
+      run: |
+        cd test-app
+        php artisan make:repository User
+        php artisan make:service User
+        php artisan make:ddd UserManagement
+        php artisan make:cqrs CreateUser
+        php artisan make:event UserCreated
+        
+    - name: Verify generated files
+      run: |
+        cd test-app
+        ls -la app/Repositories/
+        ls -la app/Services/
+        ls -la app/Domain/
+        ls -la app/Commands/
+        ls -la app/Events/
+        
+  lint:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup PHP
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: 8.2
+        
+    - name: Install dependencies
+      run: composer install --prefer-dist --no-interaction
+      
+    - name: Run PHP CS Fixer
+      run: |
+        composer require --dev friendsofphp/php-cs-fixer
+        vendor/bin/php-cs-fixer fix --dry-run --diff
+        
+  security:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup PHP
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: 8.2
+        
+    - name: Install dependencies
+      run: composer install --prefer-dist --no-interaction
+      
+    - name: Run security check
+      run: |
+        composer require --dev enlightn/security-checker
+        vendor/bin/security-checker security:check composer.lock 

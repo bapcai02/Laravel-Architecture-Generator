@@ -1,0 +1,49 @@
+<?php
+
+namespace {{namespace}};
+
+use {{model_namespace}}\{{model_name}};
+use Illuminate\Database\Eloquent\Collection;
+
+interface {{interface_name}}
+{
+    /**
+     * Find a model by its primary key.
+     */
+    public function find(int $id): ?{{model_name}};
+
+    /**
+     * Find a model by its primary key or throw an exception.
+     */
+    public function findOrFail(int $id): {{model_name}};
+
+    /**
+     * Get all models.
+     */
+    public function all(): Collection;
+
+    /**
+     * Create a new model.
+     */
+    public function create(array $data): {{model_name}};
+
+    /**
+     * Update a model.
+     */
+    public function update({{model_name}} $model, array $data): bool;
+
+    /**
+     * Delete a model.
+     */
+    public function delete({{model_name}} $model): bool;
+
+    /**
+     * Get models by criteria.
+     */
+    public function findBy(array $criteria): Collection;
+
+    /**
+     * Get a single model by criteria.
+     */
+    public function findOneBy(array $criteria): ?{{model_name}};
+} 

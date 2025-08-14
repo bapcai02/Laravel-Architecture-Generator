@@ -1,0 +1,45 @@
+{
+    "name": "laravel-architex/architecture-generator",
+    "description": "Laravel Architecture Generator - A powerful tool to generate project structure based on popular architecture patterns",
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Laravel Architex Team",
+            "email": "team@laravel-architex.com"
+        }
+    ],
+    "require": {
+        "php": "^7.4|^8.0|^8.1",
+        "laravel/framework": "^8.0|^9.0|^10.0|^11.0",
+        "illuminate/console": "^8.0|^9.0|^10.0|^11.0",
+        "illuminate/filesystem": "^8.0|^9.0|^10.0|^11.0",
+        "illuminate/support": "^8.0|^9.0|^10.0|^11.0"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^10.0",
+        "orchestra/testbench": "^8.0|^9.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "LaravelArchitex\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "LaravelArchitex\\Tests\\": "tests/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "LaravelArchitex\\ArchitexServiceProvider"
+            ]
+        }
+    },
+    "config": {
+        "sort-packages": true
+    },
+    "minimum-stability": "stable",
+    "prefer-stable": true
+} 
