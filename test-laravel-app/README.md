@@ -27,7 +27,15 @@ composer require laravel-architex/architecture-generator:dev-main
 php artisan vendor:publish --tag=architex-config
 ```
 
-### 3. Install VS Code Extensions (Optional)
+### 3. Fix Missing Files (If Needed)
+
+```bash
+# If you encounter missing file errors, run this script
+chmod +x fix-missing-files.sh
+./fix-missing-files.sh
+```
+
+### 4. Install VS Code Extensions (Optional)
 
 ```bash
 # Make script executable
@@ -199,6 +207,13 @@ Edit `config/architex.php` to customize:
 ✅ **Real Laravel App Testing**: SUCCESS  
 
 ## 🔍 Debugging
+
+### Fix Missing Files
+
+```bash
+# If you get "Class not found" errors, run this script
+./fix-missing-files.sh
+```
 
 ### Check Package Registration
 
