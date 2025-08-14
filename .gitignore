@@ -12,4 +12,7 @@ yarn-error.log
 *.log
 *.cache
 .DS_Store
-Thumbs.db 
+Thumbs.db
+
+# Test Laravel Application
+test-laravel-app/ 

@@ -4,11 +4,18 @@ namespace {{namespace}};
 
 class {{class_name}}
 {
+    protected $name;
+    protected $description;
+    protected $data;
+
     public function __construct(
-        public readonly string $name,
-        public readonly string $description,
-        public readonly array $data = []
+        string $name,
+        string $description,
+        array $data = []
     ) {
+        $this->name = $name;
+        $this->description = $description;
+        $this->data = $data;
     }
 
     /**
@@ -21,5 +28,29 @@ class {{class_name}}
             'description' => $this->description,
             'data' => $this->data,
         ];
+    }
+
+    /**
+     * Get name
+     */
+    public function getName(): string
+    {
+        return $this->name;
+    }
+
+    /**
+     * Get description
+     */
+    public function getDescription(): string
+    {
+        return $this->description;
+    }
+
+    /**
+     * Get data
+     */
+    public function getData(): array
+    {
+        return $this->data;
     }
 } 

@@ -21,19 +21,55 @@ Laravel Architex is a powerful tool that helps Laravel developers quickly initia
 ## 📦 Installation
 
 ### System Requirements:
-- PHP >= 8.1
-- Laravel >= 10.0
+- PHP >= 7.4
+- Laravel >= 8.0
 
-### Install Package:
+### Quick Setup (Recommended)
 
 ```bash
-composer require laravel-architex/architecture-generator
+# Clone repository
+git clone <repository-url>
+cd Laravel-Architecture-Generator
+
+# Run automated setup
+chmod +x setup.sh
+./setup.sh
 ```
 
-### Publish Config:
+### Manual Installation
 
 ```bash
+# Install package
+composer require laravel-architex/architecture-generator
+
+# Publish configuration
 php artisan vendor:publish --tag=architex-config
+```
+
+### For Development/Testing
+
+```bash
+# Install package dependencies
+composer install
+
+# Run package tests
+chmod +x run-tests.sh
+./run-tests.sh all
+
+# Create test Laravel app
+composer create-project laravel/laravel test-laravel-app
+cd test-laravel-app
+
+# Install Laravel Architex
+composer config repositories.laravel-architex path ../
+composer require laravel-architex/architecture-generator:dev-main
+
+# Publish configuration
+php artisan vendor:publish --tag=architex-config
+
+# Fix missing files (if needed)
+chmod +x fix-missing-files.sh
+./fix-missing-files.sh
 ```
 
 ## 🛠️ Usage
