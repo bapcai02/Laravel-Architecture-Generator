@@ -1,0 +1,110 @@
+<?php
+
+namespace {{ namespace }};
+
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+
+class {{ class_name }} extends Model
+{
+    use HasFactory, SoftDeletes;
+
+    /**
+     * The table associated with the model.
+     */
+    protected $table = '{{ table_name }}';
+
+    /**
+     * The attributes that are mass assignable.
+     */
+    protected $fillable = [
+        'name',
+        'description',
+        'status',
+        // Add more fillable fields as needed
+    ];
+
+    /**
+     * The attributes that should be cast.
+     */
+    protected $casts = [
+        'created_at' => 'datetime',
+        'updated_at' => 'datetime',
+        'deleted_at' => 'datetime',
+        // Add more casts as needed
+    ];
+
+    /**
+     * The attributes that should be hidden for serialization.
+     */
+    protected $hidden = [
+        'deleted_at',
+    ];
+
+    /**
+     * Get the route key for the model.
+     */
+    public function getRouteKeyName(): string
+    {
+        return 'id';
+    }
+
+    /**
+     * Scope a query to only include active records.
+     */
+    public function scopeActive($query)
+    {
+        return $query->where('status', 'active');
+    }
+
+    /**
+     * Scope a query to only include inactive records.
+     */
+    public function scopeInactive($query)
+    {
+        return $query->where('status', 'inactive');
+    }
+
+    /**
+     * Get the full name attribute.
+     */
+    public function getFullNameAttribute(): string
+    {
+        return $this->name;
+    }
+
+    /**
+     * Check if the model is active.
+     */
+    public function isActive(): bool
+    {
+        return $this->status === 'active';
+    }
+
+    /**
+     * Activate the model.
+     */
+    public function activate(): bool
+    {
+        return $this->update(['status' => 'active']);
+    }
+
+    /**
+     * Deactivate the model.
+     */
+    public function deactivate(): bool
+    {
+        return $this->update(['status' => 'inactive']);
+    }
+
+    /**
+     * Create a new factory instance for the model.
+     */
+    protected static function newFactory()
+    {
+        return \{{ module_namespace }}\Database\Factories\{{ class_name }}Factory::new();
+    }
+} 

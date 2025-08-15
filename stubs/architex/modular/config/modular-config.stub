@@ -1,0 +1,99 @@
+<?php
+
+return [
+    /*
+    |--------------------------------------------------------------------------
+    | {{ module_name }} Module Configuration
+    |--------------------------------------------------------------------------
+    |
+    | This file contains the configuration options for the {{ module_name }} module.
+    | You can customize these settings according to your application needs.
+    |
+    */
+
+    // Module basic information
+    'name' => '{{ module_name }}',
+    'version' => '1.0.0',
+    'description' => '{{ module_name }} module for Laravel application',
+
+    // Database configuration
+    'database' => [
+        'table_prefix' => '{{ strtolower($module_name) }}_',
+        'migrations_path' => 'Database/Migrations',
+        'seeders_path' => 'Database/Seeders',
+    ],
+
+    // Pagination settings
+    'pagination' => [
+        'per_page' => 15,
+        'max_per_page' => 100,
+    ],
+
+    // Status options
+    'statuses' => [
+        'active' => 'active',
+        'inactive' => 'inactive',
+        'pending' => 'pending',
+        'suspended' => 'suspended',
+    ],
+
+    // File upload settings
+    'uploads' => [
+        'disk' => 'public',
+        'path' => '{{ strtolower($module_name) }}s',
+        'allowed_extensions' => ['jpg', 'jpeg', 'png', 'gif', 'pdf'],
+        'max_file_size' => 2048, // KB
+    ],
+
+    // Cache settings
+    'cache' => [
+        'enabled' => true,
+        'ttl' => 3600, // seconds
+        'prefix' => '{{ strtolower($module_name) }}_',
+    ],
+
+    // API settings
+    'api' => [
+        'enabled' => true,
+        'version' => 'v1',
+        'rate_limit' => 60, // requests per minute
+    ],
+
+    // Notification settings
+    'notifications' => [
+        'email' => [
+            'enabled' => true,
+            'from_address' => env('{{ strtoupper($module_name) }}_FROM_EMAIL', 'noreply@example.com'),
+            'from_name' => env('{{ strtoupper($module_name) }}_FROM_NAME', '{{ module_name }} Module'),
+        ],
+        'sms' => [
+            'enabled' => false,
+        ],
+    ],
+
+    // Validation rules
+    'validation' => [
+        'name' => 'required|string|max:255',
+        'description' => 'nullable|string|max:1000',
+        'status' => 'required|in:active,inactive,pending,suspended',
+    ],
+
+    // Permissions
+    'permissions' => [
+        'view' => '{{ strtolower($module_name) }}.view',
+        'create' => '{{ strtolower($module_name) }}.create',
+        'edit' => '{{ strtolower($module_name) }}.edit',
+        'delete' => '{{ strtolower($module_name) }}.delete',
+        'activate' => '{{ strtolower($module_name) }}.activate',
+        'deactivate' => '{{ strtolower($module_name) }}.deactivate',
+    ],
+
+    // Events
+    'events' => [
+        'created' => '{{ module_namespace }}\\Events\\{{ module_name }}Created',
+        'updated' => '{{ module_namespace }}\\Events\\{{ module_name }}Updated',
+        'deleted' => '{{ module_namespace }}\\Events\\{{ module_name }}Deleted',
+        'activated' => '{{ module_namespace }}\\Events\\{{ module_name }}Activated',
+        'deactivated' => '{{ module_namespace }}\\Events\\{{ module_name }}Deactivated',
+    ],
+]; 

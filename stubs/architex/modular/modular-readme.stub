@@ -1,0 +1,213 @@
+# {{ module_name }} Module
+
+A comprehensive Laravel module for managing {{ strtolower($module_name) }}s with full CRUD operations, validation, and business logic.
+
+## Features
+
+- ✅ Complete CRUD operations
+- ✅ Repository pattern implementation
+- ✅ Service layer with business logic
+- ✅ Soft deletes support
+- ✅ Status management (active/inactive)
+- ✅ Search and filtering capabilities
+- ✅ Pagination support
+- ✅ Comprehensive test coverage
+- ✅ Database migrations and seeders
+- ✅ Configuration management
+- ✅ Route management
+- ✅ View templates (optional)
+- ✅ Asset management (optional)
+
+## Installation
+
+1. **Register the module in your `AppServiceProvider`:**
+
+```php
+// app/Providers/AppServiceProvider.php
+public function register(): void
+{
+    // Register {{ module_name }} module
+    $this->app->register(\{{ module_namespace }}\Providers\{{ module_name }}ServiceProvider::class);
+}
+```
+
+2. **Add module routes to your main routes file:**
+
+```php
+// routes/web.php
+Route::group(['prefix' => '{{ strtolower($module_name) }}'], function () {
+    require __DIR__ . '/../app/Modules/{{ module_name }}/Routes/web.php';
+});
+```
+
+3. **Publish module assets (optional):**
+
+```bash
+php artisan vendor:publish --tag={{ strtolower($module_name) }}-assets
+```
+
+4. **Publish module config (optional):**
+
+```bash
+php artisan vendor:publish --tag={{ strtolower($module_name) }}-config
+```
+
+5. **Run migrations:**
+
+```bash
+php artisan migrate
+```
+
+6. **Seed the database (optional):**
+
+```bash
+php artisan db:seed --class={{ module_namespace }}\Database\Seeders\{{ module_name }}Seeder
+```
+
+## Usage
+
+### Basic CRUD Operations
+
+```php
+use {{ module_namespace }}\Services\{{ module_name }}Service;
+use {{ module_namespace }}\Models\{{ module_name }};
+
+// Get service instance
+$service = app({{ module_name }}Service::class);
+
+// Create a new {{ strtolower($module_name) }}
+${{ strtolower($module_name) }} = $service->create([
+    'name' => 'My {{ module_name }}',
+    'description' => 'Description here',
+    'status' => 'active'
+]);
+
+// Find by ID
+${{ strtolower($module_name) }} = $service->findById(1);
+
+// Update
+$service->update(${{ strtolower($module_name) }}, [
+    'name' => 'Updated Name'
+]);
+
+// Delete
+$service->delete(${{ strtolower($module_name) }});
+
+// Get all with pagination
+${{ strtolower($module_name) }}s = $service->getAll([], 15);
+
+// Search
+$results = $service->search(['name' => 'search term']);
+```
+
+### Status Management
+
+```php
+// Activate/Deactivate
+$service->activate(${{ strtolower($module_name) }});
+$service->deactivate(${{ strtolower($module_name) }});
+
+// Get by status
+$active{{ module_name }}s = $service->getActive();
+$inactive{{ module_name }}s = $service->getInactive();
+```
+
+### Using the Model
+
+```php
+use {{ module_namespace }}\Models\{{ module_name }};
+
+// Scopes
+$active{{ module_name }}s = {{ module_name }}::active()->get();
+$inactive{{ module_name }}s = {{ module_name }}::inactive()->get();
+
+// Accessors
+$fullName = ${{ strtolower($module_name) }}->full_name;
+
+// Methods
+if (${{ strtolower($module_name) }}->isActive()) {
+    // Do something
+}
+
+${{ strtolower($module_name) }}->activate();
+${{ strtolower($module_name) }}->deactivate();
+```
+
+## Configuration
+
+The module configuration is located in `config/{{ strtolower($module_name) }}.php`:
+
+```php
+return [
+    'pagination' => [
+        'per_page' => 15,
+        'max_per_page' => 100,
+    ],
+    
+    'statuses' => [
+        'active' => 'active',
+        'inactive' => 'inactive',
+        'pending' => 'pending',
+        'suspended' => 'suspended',
+    ],
+    
+    // ... more configuration options
+];
+```
+
+## Routes
+
+The module provides the following routes:
+
+- `GET {{ strtolower($module_name) }}/{{ strtolower($module_name) }}s` - List all {{ strtolower($module_name) }}s
+- `GET {{ strtolower($module_name) }}/{{ strtolower($module_name) }}s/create` - Show create form
+- `POST {{ strtolower($module_name) }}/{{ strtolower($module_name) }}s` - Store new {{ strtolower($module_name) }}
+- `GET {{ strtolower($module_name) }}/{{ strtolower($module_name) }}s/{id}` - Show {{ strtolower($module_name) }}
+- `GET {{ strtolower($module_name) }}/{{ strtolower($module_name) }}s/{id}/edit` - Show edit form
+- `PUT/PATCH {{ strtolower($module_name) }}/{{ strtolower($module_name) }}s/{id}` - Update {{ strtolower($module_name) }}
+- `DELETE {{ strtolower($module_name) }}/{{ strtolower($module_name) }}s/{id}` - Delete {{ strtolower($module_name) }}
+- `GET {{ strtolower($module_name) }}/{{ strtolower($module_name) }}s/{id}/activate` - Activate {{ strtolower($module_name) }}
+- `GET {{ strtolower($module_name) }}/{{ strtolower($module_name) }}s/{id}/deactivate` - Deactivate {{ strtolower($module_name) }}
+
+## Testing
+
+Run the module tests:
+
+```bash
+php artisan test --filter={{ module_name }}Test
+```
+
+Or run all tests:
+
+```bash
+php artisan test
+```
+
+## Customization
+
+### Adding Custom Fields
+
+1. Create a new migration to add fields to the table
+2. Update the model's `$fillable` array
+3. Update validation rules in the service
+4. Update the controller methods
+
+### Adding Custom Methods
+
+1. Add methods to the service class
+2. Add corresponding repository methods
+3. Add controller methods if needed
+4. Add routes if needed
+5. Write tests for new functionality
+
+## Contributing
+
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Add tests
+5. Submit a pull request
+
+## License
+
+This module is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT). 

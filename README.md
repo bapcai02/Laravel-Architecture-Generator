@@ -10,6 +10,8 @@ Laravel Architex is a powerful tool that helps Laravel developers quickly initia
 - **Service Layer** - Create service classes with basic methods
 - **CQRS (Command Query Responsibility Segregation)** - Create commands, queries and handlers
 - **Event Bus** - Create events and listeners
+- **Modular/Package-based Architecture** - Create complete module structure with controllers, models, services, repositories, routes, config, tests, and more
+- **Hexagonal Architecture (Ports and Adapters)** - Create clean architecture with domain isolation, ports, and adapters
 
 ### Additional Features:
 - ✅ Configurable naming conventions (class names, interfaces, namespaces, folder structure)
@@ -437,60 +439,143 @@ php artisan make:event UserCreated --force
 - `app/Events/UserCreatedEvent.php`
 - `app/Listeners/UserCreatedListener.php`
 
+### 6. Modular/Package-based Architecture
+
+```bash
+# Create complete modular structure
+php artisan architex:modular UserManagement
+
+# Create with specific options
+php artisan architex:modular UserManagement --with-tests --with-migrations --with-seeders --with-routes --with-config
+
+# Create with custom path and namespace
+php artisan architex:modular UserManagement --path=app/Modules --namespace=App\\Modules
+
+# Create with all features
+php artisan architex:modular UserManagement --with-tests --with-migrations --with-seeders --with-routes --with-config --with-views --with-assets
+
+# Overwrite existing files
+php artisan architex:modular UserManagement --force
+```
+
+**Result:**
+```
+app/Modules/UserManagement/
+├── Controllers/
+│   └── UserManagementController.php
+├── Models/
+│   └── UserManagement.php
+├── Services/
+│   └── UserManagementService.php
+├── Repositories/
+│   └── UserManagementRepository.php
+├── Providers/
+│   └── UserManagementServiceProvider.php
+├── Routes/
+│   └── web.php
+├── Config/
+│   └── usermanagement.php
+├── Views/ (optional)
+├── Assets/ (optional)
+├── Database/
+│   ├── Migrations/
+│   │   └── 2024_01_01_000000_create_user_managements_table.php
+│   └── Seeders/
+│       └── UserManagementSeeder.php
+├── Tests/
+│   └── UserManagementTest.php
+└── README.md
+```
+
+**Features:**
+- ✅ Complete CRUD operations with controllers
+- ✅ Repository pattern implementation
+- ✅ Service layer with business logic
+- ✅ Database migrations and seeders
+- ✅ Comprehensive test coverage
+- ✅ Module configuration management
+- ✅ Route management with middleware
+- ✅ Service provider for module registration
+- ✅ Optional view templates and assets
+- ✅ Documentation and usage examples
+
+### 7. Hexagonal Architecture (Ports and Adapters)
+
+```bash
+# Create complete hexagonal structure
+php artisan architex:hexagonal User
+
+# Create with specific options
+php artisan architex:hexagonal User --with-tests --with-migrations --with-routes
+
+# Create with custom path and namespace
+php artisan architex:hexagonal User --path=app/Hexagonal --namespace=App\\Hexagonal
+
+# Create with all features
+php artisan architex:hexagonal User --with-tests --with-migrations --with-routes --with-config
+
+# Overwrite existing files
+php artisan architex:hexagonal User --force
+```
+
+**Result:**
+```
+app/Hexagonal/User/
+├── Domain/
+│   ├── Entities/
+│   │   └── User.php
+│   └── Ports/
+│       ├── UserRepositoryPort.php
+│       └── UserServicePort.php
+├── Application/
+│   └── Services/
+│       └── UserApplicationService.php
+├── Infrastructure/
+│   ├── Adapters/
+│   │   └── UserRepositoryAdapter.php
+│   └── database/migrations/
+│       └── create_users_table.php
+├── UI/
+│   ├── Adapters/
+│   │   └── UserControllerAdapter.php
+│   └── routes/
+│       └── user_routes.php
+├── Tests/
+│   └── UserHexagonalTest.php
+└── UserServiceProvider.php
+```
+
+**Features:**
+- ✅ Domain entities with business logic
+- ✅ Port interfaces for dependency inversion
+- ✅ Application services for use cases
+- ✅ Infrastructure adapters for external concerns
+- ✅ UI adapters for primary ports
+- ✅ Service provider for dependency injection
+- ✅ Database migrations and tests
+- ✅ Route management
+- ✅ Clean separation of concerns
+
 ## ⚙️ Configuration
 
 ### Config File: `config/architex.php`
 
-```php
-return [
-    'patterns' => [
-        'ddd' => [
-            'enabled' => true,
-            'layers' => [
-                'domain' => [
-                    'path' => 'app/Domain',
-                    'namespaces' => [
-                        'entities' => 'App\\Domain\\Entities',
-                        'repositories' => 'App\\Domain\\Repositories',
-                        // ...
-                    ],
-                ],
-                // ...
-            ],
-        ],
-        'repository' => [
-            'enabled' => true,
-            'path' => 'app/Repositories',
-            'namespace' => 'App\\Repositories',
-            'interface_suffix' => 'RepositoryInterface',
-            'implementation_suffix' => 'Repository',
-        ],
-        // ...
-    ],
+The configuration file allows you to customize:
+- **Architecture patterns** (DDD, Repository, Service, CQRS, Event Bus, Modular)
+- **Naming conventions** (class names, interfaces, namespaces)
+- **Template engine** settings
+- **Auto registration** options
 
-    'naming' => [
-        'case' => 'pascal', // pascal, camel, snake, kebab
-        'separator' => '_',
-        'pluralize' => true,
-        'suffixes' => [
-            'repository' => 'Repository',
-            'repository_interface' => 'RepositoryInterface',
-            'service' => 'Service',
-            // ...
-        ],
-    ],
-
-    'templates' => [
-        'stub_path' => base_path('stubs/architex'),
-        'default_stub_path' => __DIR__ . '/../stubs',
-        'variables' => [
-            'app_namespace' => 'App',
-            'author' => 'Laravel Architex',
-            'year' => date('Y'),
-        ],
-    ],
-];
+```bash
+# Publish config file
+php artisan vendor:publish --tag=architex-config
 ```
+
+**Key Configuration Sections:**
+- `patterns` - Enable/disable and configure architecture patterns
+- `naming` - Customize naming conventions and suffixes
+- `templates` - Configure template engine and stub paths
+- `auto_register` - Automatic service provider registration
 
 ## 🎨 Customizing Templates
 
@@ -641,269 +726,12 @@ composer install
 ./vendor/bin/phpunit --filter test_can_generate_repository
 ```
 
-### Test Coverage
+## 📚 Documentation
 
-The test suite covers:
-
-- ✅ **Architecture Generation**: All pattern generation methods
-- ✅ **Template Engine**: Stub rendering and variable replacement
-- ✅ **Artisan Commands**: Command execution and output
-- ✅ **File Generation**: Directory and file creation
-- ✅ **Configuration**: Config loading and merging
-
-### 🚀 Real Laravel Application Testing
-
-#### 1. Create Test Laravel App
-
-```bash
-# Create new Laravel application
-composer create-project laravel/laravel test-laravel-app
-
-# Navigate to test app
-cd test-laravel-app
-
-# Install Laravel Architex
-composer require laravel-architex/architecture-generator:dev-main
-
-# Publish configuration
-php artisan vendor:publish --tag=architex-config
-```
-
-#### 2. Test All Commands
-
-```bash
-# Test Repository Pattern
-php artisan make:repository User
-# Output: Creating repository for: User
-#         Repository created successfully!
-#         Created files:
-#           - app/Repositories/Interfaces/UserRepositoryInterface.php
-#           - app/Repositories/UserRepository.php
-
-# Test Service Layer
-php artisan make:service User
-# Output: Creating service: User
-#         Service created successfully!
-#           - app/Services/UserService.php
-
-# Test DDD Structure
-php artisan make:ddd UserManagement
-# Output: Creating DDD module: UserManagement
-#         DDD module created successfully!
-#         Created files:
-#           - app/Domain/UserManagement/Entities/UserManagementEntities.php
-#           - app/Domain/UserManagement/Repositories/UserManagementRepositories.php
-#           - app/Domain/UserManagement/Services/UserManagementServices.php
-#           - app/Domain/UserManagement/Events/UserManagementEvents.php
-#           - app/Domain/UserManagement/Exceptions/UserManagementExceptions.php
-#           - app/Application/UserManagement/Services/UserManagementServices.php
-#           - app/Application/UserManagement/Commands/UserManagementCommands.php
-#           - app/Application/UserManagement/Queries/UserManagementQueries.php
-#           - app/Application/UserManagement/Handlers/UserManagementHandlers.php
-#           - app/Infrastructure/UserManagement/Repositories/UserManagementRepositories.php
-#           - app/Infrastructure/UserManagement/Services/UserManagementServices.php
-#           - app/Infrastructure/UserManagement/Persistence/UserManagementPersistence.php
-#           - app/Infrastructure/UserManagement/External/UserManagementExternal.php
-#           - app/UI/UserManagement/Controllers/UserManagementControllers.php
-#           - app/UI/UserManagement/Requests/UserManagementRequests.php
-#           - app/UI/UserManagement/Resources/UserManagementResources.php
-#           - app/UI/UserManagement/Middleware/UserManagementMiddleware.php
-
-# Test CQRS Pattern
-php artisan make:cqrs CreateUser
-# Output: Creating CQRS structure: CreateUser
-#         CQRS structure created successfully!
-#           - app/Commands/CreateUserCommand.php
-#           - app/Queries/CreateUserQuery.php
-#           - app/Handlers/CreateUserHandler.php
-
-# Test Event Bus
-php artisan make:event UserCreated
-# Output: Event created successfully.
-```
-
-#### 3. Verify Generated Files
-
-```bash
-# Check Repository files
-ls -la app/Repositories/
-# Output: total 16
-#         drwxr-xr-x  3 hadv hadv 4096 Thg 8  14 21:42 .
-#         drwxrwxr-x 17 hadv hadv 4096 Thg 8  14 21:42 ..
-#         drwxr-xr-x  2 hadv hadv 4096 Thg 8  14 21:42 Interfaces
-#         -rw-rw-r--  1 hadv hadv 1678 Thg 8  14 21:42 UserRepository.php
-
-# Check Service files
-ls -la app/Services/
-# Output: total 12
-#         drwxr-xr-x  2 hadv hadv 4096 Thg 8  14 21:42 .
-#         drwxrwxr-x 17 hadv hadv 4096 Thg 8  14 21:42 ..
-#         -rw-rw-r--  1 hadv hadv 1273 Thg 8  14 21:42 UserService.php
-
-# Check DDD structure
-ls -la app/Domain/UserManagement/
-# Output: total 28
-#         drwxr-xr-x 7 hadv hadv 4096 Thg 8  14 21:42 .
-#         drwxr-xr-x 3 hadv hadv 4096 Thg 8  14 21:42 ..
-#         drwxr-xr-x 2 hadv hadv 4096 Thg 8  14 21:42 Entities
-#         drwxr-xr-x  2 hadv hadv 4096 Thg 8  14 21:42 Events
-#         drwxr-xr-x  2 hadv hadv 4096 Thg 8  14 21:42 Exceptions
-#         drwxr-xr-x  2 hadv hadv 4096 Thg 8  14 21:42 Repositories
-#         drwxr-xr-x  2 hadv hadv 4096 Thg 8  14 21:42 Services
-
-# Check CQRS files
-ls -la app/Commands/ app/Queries/ app/Handlers/
-# Output: app/Commands/:
-#         total 12
-#         drwxr-xr-x  2 hadv hadv 4096 Thg 8  14 21:42 .
-#         drwxrwxr-x 17 hadv hadv 4096 Thg 8  14 21:42 ..
-#         -rw-rw-r--  1 hadv hadv  485 Thg 8  14 21:42 CreateUserCommand.php
-#         app/Handlers/:
-#         total 12
-#         drwxr-xr-x  2 hadv hadv 4096 Thg 8  14 21:42 .
-#         drwxrwxr-x 17 hadv hadv 4096 Thg 8  14 21:42 ..
-#         -rw-rw-r--  1 hadv hadv  940 Thg 8  14 21:42 CreateUserHandler.php
-#         app/Queries/:
-#         total 12
-#         drwxr-xr-x  2 hadv hadv 4096 Thg 8  14 21:42 .
-#         drwxrwxr-x 17 hadv hadv 4096 Thg 8  14 21:42 ..
-#         -rw-rw-r--  1 hadv hadv  477 Thg 8  14 21:42 CreateUserQuery.php
-```
-
-#### 4. Test API Integration
-
-```bash
-# Start development server
-php artisan serve
-
-# Test health check endpoint
-curl http://localhost:8000/api/health
-# Output: {
-#   "status": "healthy",
-#   "message": "Laravel Architex Test Application is running",
-#   "timestamp": "2024-08-14T14:42:00.000000Z",
-#   "architecture_patterns": {
-#     "Repository Pattern": "Available",
-#     "Service Layer": "Available",
-#     "DDD": "Available",
-#     "CQRS": "Available",
-#     "Event Bus": "Available"
-#   }
-# }
-
-# Test Repository Pattern API
-curl http://localhost:8000/api/architex-test/users/1
-# Output: {
-#   "message": "User retrieved successfully",
-#   "data": {...},
-#   "architecture": "Repository Pattern"
-# }
-
-# Test Service Layer API
-curl http://localhost:8000/api/architex-test/users
-# Output: {
-#   "message": "Users retrieved successfully",
-#   "data": [...],
-#   "architecture": "Service Layer Pattern"
-# }
-
-# Test CQRS Pattern API
-curl -X POST http://localhost:8000/api/architex-test/cqrs-test \
-  -H "Content-Type: application/json" \
-  -d '{"name":"Test User","description":"Test Description"}'
-# Output: {
-#   "message": "CQRS Command created successfully",
-#   "command_data": {
-#     "name": "Test User",
-#     "description": "Test Description",
-#     "data": {...}
-#   },
-#   "architecture": "CQRS Pattern"
-# }
-```
-
-#### 5. Test Summary
-
-```bash
-# Run comprehensive test
-php artisan architex:test
-# Output: 🚀 Laravel Architex Test Script
-#         ================================
-#         
-#         1. Testing Service Layer Pattern:
-#         ---------------------------------
-#         ✅ UserService instantiated successfully
-#         ✅ getAll() method works: 0 users found
-#         ✅ Service Layer Pattern: PASSED
-#         
-#         2. Testing Repository Pattern:
-#         ------------------------------
-#         ✅ UserRepositoryInterface resolved successfully
-#         ✅ all() method works: 0 users found
-#         ✅ Repository Pattern: PASSED
-#         
-#         3. Testing CQRS Pattern:
-#         -----------------------
-#         ✅ CreateUserCommand created successfully
-#         ✅ Command data: {"name":"Test User","description":"Test Description","data":{...}}
-#         ✅ CQRS Pattern: PASSED
-#         
-#         4. Verifying Generated File Structure:
-#         --------------------------------------
-#         ✅ app/Repositories/Interfaces/UserRepositoryInterface.php exists
-#         ✅ app/Repositories/UserRepository.php exists
-#         ✅ app/Services/UserService.php exists
-#         ✅ app/Commands/CreateUserCommand.php exists
-#         ✅ app/Queries/CreateUserQuery.php exists
-#         ✅ app/Handlers/CreateUserHandler.php exists
-#         ✅ app/Domain/UserManagement/Entities/UserManagementEntities.php exists
-#         ✅ app/Application/UserManagement/Services/UserManagementServices.php exists
-#         ✅ app/Infrastructure/UserManagement/Repositories/UserManagementRepositories.php exists
-#         ✅ app/UI/UserManagement/Controllers/UserManagementControllers.php exists
-#         ✅ All generated files exist
-#         
-#         5. Testing Artisan Commands:
-#         ---------------------------
-#         ✅ make:repository command available
-#         ✅ make:service command available
-#         ✅ make:ddd command available
-#         ✅ make:cqrs command available
-#         ✅ make:event command available
-#         ✅ All Artisan commands are registered
-#         
-#         📊 Test Summary:
-#         ================
-#         ✅ Service Layer Pattern: Working
-#         ✅ Repository Pattern: Working
-#         ✅ CQRS Pattern: Working
-#         ✅ DDD Structure: Generated
-#         ✅ Event Bus: Available
-#         ✅ Artisan Commands: Registered
-#         ✅ File Generation: Successful
-#         
-#         🎉 Laravel Architex is working perfectly!
-```
-
-### Test Results Summary
-
-✅ **Package Installation**: SUCCESS  
-✅ **Configuration Publishing**: SUCCESS  
-✅ **Artisan Commands Registration**: SUCCESS  
-✅ **Repository Pattern Generation**: SUCCESS  
-✅ **Service Layer Generation**: SUCCESS  
-✅ **DDD Structure Generation**: SUCCESS  
-✅ **CQRS Pattern Generation**: SUCCESS  
-✅ **Event Bus Generation**: SUCCESS  
-✅ **File Structure Creation**: SUCCESS  
-✅ **Template Engine**: SUCCESS  
-✅ **Service Provider Integration**: SUCCESS  
-✅ **API Integration**: SUCCESS  
-✅ **Real Laravel App Testing**: SUCCESS
-- ✅ **Artisan Commands**: All command functionality
-- ✅ **Error Handling**: Exception scenarios
-- ✅ **File System Operations**: Directory and file creation
-
-For detailed testing information, see [TESTING.md](TESTING.md).
+- **[README.md](README.md)** - Main documentation and usage guide
+- **[DEVELOPMENT.md](DEVELOPMENT.md)** - Development setup, testing, and contributing guide
+- **[TESTING.md](TESTING.md)** - Detailed testing information
+- **[INSTALLATION_GUIDE.md](INSTALLATION_GUIDE.md)** - Step-by-step installation guide
 
 ## 🆘 Support
 

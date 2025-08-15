@@ -1,0 +1,70 @@
+<?php
+
+namespace {{ namespace }};
+
+use Illuminate\Database\Seeder;
+use {{ model_namespace }}\{{ module_name }};
+use Illuminate\Support\Str;
+
+class {{ class_name }} extends Seeder
+{
+    /**
+     * Run the database seeds.
+     */
+    public function run(): void
+    {
+        // Create sample {{ strtolower($module_name) }}s
+        ${{ strtolower($module_name) }}s = [
+            [
+                'name' => 'Sample {{ module_name }} 1',
+                'slug' => 'sample-{{ strtolower($module_name) }}-1',
+                'description' => 'This is a sample {{ strtolower($module_name) }} for testing purposes.',
+                'status' => 'active',
+                'metadata' => json_encode([
+                    'category' => 'sample',
+                    'tags' => ['test', 'sample'],
+                ]),
+                'sort_order' => 1,
+                'is_featured' => true,
+                'published_at' => now(),
+            ],
+            [
+                'name' => 'Sample {{ module_name }} 2',
+                'slug' => 'sample-{{ strtolower($module_name) }}-2',
+                'description' => 'Another sample {{ strtolower($module_name) }} for demonstration.',
+                'status' => 'active',
+                'metadata' => json_encode([
+                    'category' => 'demo',
+                    'tags' => ['demo', 'example'],
+                ]),
+                'sort_order' => 2,
+                'is_featured' => false,
+                'published_at' => now(),
+            ],
+            [
+                'name' => 'Inactive {{ module_name }}',
+                'slug' => 'inactive-{{ strtolower($module_name) }}',
+                'description' => 'This {{ strtolower($module_name) }} is inactive.',
+                'status' => 'inactive',
+                'metadata' => json_encode([
+                    'category' => 'inactive',
+                    'tags' => ['inactive'],
+                ]),
+                'sort_order' => 3,
+                'is_featured' => false,
+                'published_at' => null,
+            ],
+        ];
+
+        foreach (${{ strtolower($module_name) }}s as ${{ strtolower($module_name) }}) {
+            {{ module_name }}::create(${{ strtolower($module_name) }});
+        }
+
+        // Create additional random {{ strtolower($module_name) }}s if needed
+        if (config('app.env') === 'local') {
+            {{ module_name }}::factory(10)->create();
+        }
+
+        $this->command->info('{{ module_name }} seeder completed successfully!');
+    }
+} 

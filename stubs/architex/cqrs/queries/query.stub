@@ -1,0 +1,80 @@
+<?php
+
+namespace {{ namespace }};
+
+class {{ class_name }}
+{
+    protected $filters;
+    protected $sortBy;
+    protected $sortDirection;
+    protected $limit;
+    protected $offset;
+
+    public function __construct(
+        array $filters = [],
+        string $sortBy = 'id',
+        string $sortDirection = 'asc',
+        int $limit = 10,
+        int $offset = 0
+    ) {
+        $this->filters = $filters;
+        $this->sortBy = $sortBy;
+        $this->sortDirection = $sortDirection;
+        $this->limit = $limit;
+        $this->offset = $offset;
+    }
+
+    /**
+     * Get the query parameters as an array.
+     */
+    public function toArray(): array
+    {
+        return [
+            'filters' => $this->filters,
+            'sort_by' => $this->sortBy,
+            'sort_direction' => $this->sortDirection,
+            'limit' => $this->limit,
+            'offset' => $this->offset,
+        ];
+    }
+
+    /**
+     * Get filters
+     */
+    public function getFilters(): array
+    {
+        return $this->filters;
+    }
+
+    /**
+     * Get sort by
+     */
+    public function getSortBy(): string
+    {
+        return $this->sortBy;
+    }
+
+    /**
+     * Get sort direction
+     */
+    public function getSortDirection(): string
+    {
+        return $this->sortDirection;
+    }
+
+    /**
+     * Get limit
+     */
+    public function getLimit(): int
+    {
+        return $this->limit;
+    }
+
+    /**
+     * Get offset
+     */
+    public function getOffset(): int
+    {
+        return $this->offset;
+    }
+} 

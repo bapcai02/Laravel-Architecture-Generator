@@ -1,0 +1,61 @@
+<?php
+
+namespace {{ namespace }};
+
+use {{ query_namespace }}\{{ query_class }};
+
+class {{ class_name }}
+{
+    /**
+     * Handle the query.
+     *
+     * @param {{ query_class }} $query
+     * @return mixed
+     */
+    public function handle({{ query_class }} $query)
+    {
+        // Extract parameters from query
+        $filters = $query->getFilters();
+        $sortBy = $query->getSortBy();
+        $sortDirection = $query->getSortDirection();
+        $limit = $query->getLimit();
+        $offset = $query->getOffset();
+
+        // Build query
+        $modelQuery = \App\Models\{{ model_name }}::query();
+
+        // Apply filters
+        foreach ($filters as $field => $value) {
+            if (is_array($value)) {
+                $operator = $value[0] ?? '=';
+                $filterValue = $value[1] ?? $value;
+                $modelQuery->where($field, $operator, $filterValue);
+            } else {
+                $modelQuery->where($field, $value);
+            }
+        }
+
+        // Apply sorting
+        $modelQuery->orderBy($sortBy, $sortDirection);
+
+        // Apply pagination
+        if ($limit > 0) {
+            $modelQuery->limit($limit)->offset($offset);
+        }
+
+        // Execute query
+        $results = $modelQuery->get();
+
+        // Return result
+        return [
+            'success' => true,
+            'data' => $results,
+            'total' => $results->count(),
+            'filters' => $filters,
+            'sort_by' => $sortBy,
+            'sort_direction' => $sortDirection,
+            'limit' => $limit,
+            'offset' => $offset
+        ];
+    }
+} 
