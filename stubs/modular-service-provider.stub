@@ -1,0 +1,51 @@
+<?php
+
+namespace {{ namespace }};
+
+use Illuminate\Support\ServiceProvider;
+use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\View;
+
+class {{ class_name }} extends ServiceProvider
+{
+    /**
+     * Register any application services.
+     */
+    public function register(): void
+    {
+        // Register module bindings
+        $this->app->bind(\{{ module_namespace }}\Repositories\{{ module_name }}RepositoryInterface::class, 
+                        \{{ module_namespace }}\Repositories\{{ module_name }}Repository::class);
+        
+        $this->app->bind(\{{ module_namespace }}\Services\{{ module_name }}ServiceInterface::class, 
+                        \{{ module_namespace }}\Services\{{ module_name }}Service::class);
+    }
+
+    /**
+     * Bootstrap any application services.
+     */
+    public function boot(): void
+    {
+        @if($with_routes)
+        // Load module routes
+        $this->loadRoutesFrom(__DIR__ . '/../Routes/web.php');
+        @endif
+
+        @if($with_views)
+        // Load module views
+        $this->loadViewsFrom(__DIR__ . '/../Views', '{{ strtolower($module_name) }}');
+        @endif
+
+        @if($with_assets)
+        // Publish module assets
+        $this->publishes([
+            __DIR__ . '/../Assets' => public_path('modules/{{ strtolower($module_name) }}'),
+        ], '{{ strtolower($module_name) }}-assets');
+        @endif
+
+        // Publish module config
+        $this->publishes([
+            __DIR__ . '/../Config/{{ strtolower($module_name) }}.php' => config_path('{{ strtolower($module_name) }}.php'),
+        ], '{{ strtolower($module_name) }}-config');
+    }
+} 

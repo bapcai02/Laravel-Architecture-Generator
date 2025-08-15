@@ -1,0 +1,42 @@
+<?php
+
+use Illuminate\Support\Facades\Route;
+use {{ module_namespace }}\Controllers\{{ module_name }}Controller;
+
+/*
+|--------------------------------------------------------------------------
+| {{ module_name }} Module Routes
+|--------------------------------------------------------------------------
+|
+| Here is where you can register web routes for your {{ module_name }} module.
+| These routes are loaded by the {{ module_name }}ServiceProvider.
+|
+*/
+
+Route::group([
+    'prefix' => '{{ strtolower($module_name) }}',
+    'middleware' => ['web', 'auth'],
+    'as' => '{{ strtolower($module_name) }}.'
+], function () {
+    
+    // Resource routes
+    Route::resource('{{ strtolower($module_name) }}s', {{ module_name }}Controller::class);
+    
+    // Additional custom routes
+    Route::get('{{ strtolower($module_name) }}s/{id}/activate', [{{ module_name }}Controller::class, 'activate'])
+         ->name('{{ strtolower($module_name) }}s.activate');
+    
+    Route::get('{{ strtolower($module_name) }}s/{id}/deactivate', [{{ module_name }}Controller::class, 'deactivate'])
+         ->name('{{ strtolower($module_name) }}s.deactivate');
+    
+    Route::get('{{ strtolower($module_name) }}s/search', [{{ module_name }}Controller::class, 'search'])
+         ->name('{{ strtolower($module_name) }}s.search');
+    
+    // API routes (if needed)
+    Route::group([
+        'prefix' => 'api',
+        'middleware' => ['api'],
+    ], function () {
+        Route::apiResource('{{ strtolower($module_name) }}s', {{ module_name }}Controller::class);
+    });
+}); 

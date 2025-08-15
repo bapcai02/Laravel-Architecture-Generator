@@ -56,9 +56,42 @@ class TemplateEngine
     protected function replaceVariables(string $content, array $variables): string
     {
         foreach ($variables as $key => $value) {
-            $placeholder = '{{' . $key . '}}';
-            $content = str_replace($placeholder, $value, $content);
+            // Handle multiple formats: {{ variable }}, {{ variable }}, {{variable}}
+            $placeholders = [
+                '{{' . $key . '}}',
+                '{{ ' . $key . ' }}',
+                '{{' . $key . ' }}',
+                '{{ ' . $key . '}}'
+            ];
+            
+            foreach ($placeholders as $placeholder) {
+                $content = str_replace($placeholder, $value, $content);
+            }
         }
+        
+        // Handle Blade-like conditionals for modular templates
+        $content = $this->processConditionals($content, $variables);
+        
+        return $content;
+    }
+
+    /**
+     * Process conditional statements in templates
+     */
+    protected function processConditionals(string $content, array $variables): string
+    {
+        // Handle @if($variable) ... @endif patterns
+        $content = preg_replace_callback('/@if\s*\(\s*([^)]+)\s*\)(.*?)@endif/s', function($matches) use ($variables) {
+            $condition = trim($matches[1]);
+            $body = $matches[2];
+            
+            // Simple condition evaluation
+            if (isset($variables[$condition]) && $variables[$condition]) {
+                return $body;
+            }
+            
+            return '';
+        }, $content);
         
         return $content;
     }

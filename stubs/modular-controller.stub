@@ -1,0 +1,101 @@
+<?php
+
+namespace {{ namespace }};
+
+use Illuminate\Http\Request;
+use Illuminate\Http\JsonResponse;
+use Illuminate\View\View;
+use {{ module_namespace }}\Services\{{ module_name }}Service;
+use {{ module_namespace }}\Models\{{ module_name }};
+
+class {{ class_name }} extends Controller
+{
+    protected {{ module_name }}Service ${{ strtolower($module_name) }}Service;
+
+    public function __construct({{ module_name }}Service ${{ strtolower($module_name) }}Service)
+    {
+        $this->{{ strtolower($module_name) }}Service = ${{ strtolower($module_name) }}Service;
+    }
+
+    /**
+     * Display a listing of the resource.
+     */
+    public function index(): View
+    {
+        ${{ strtolower($module_name) }}s = $this->{{ strtolower($module_name) }}Service->getAll();
+        
+        return view('{{ strtolower($module_name) }}::index', compact('{{ strtolower($module_name) }}s'));
+    }
+
+    /**
+     * Show the form for creating a new resource.
+     */
+    public function create(): View
+    {
+        return view('{{ strtolower($module_name) }}::create');
+    }
+
+    /**
+     * Store a newly created resource in storage.
+     */
+    public function store(Request $request): JsonResponse
+    {
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            // Add more validation rules as needed
+        ]);
+
+        ${{ strtolower($module_name) }} = $this->{{ strtolower($module_name) }}Service->create($validated);
+
+        return response()->json([
+            'message' => '{{ module_name }} created successfully',
+            'data' => ${{ strtolower($module_name) }}
+        ], 201);
+    }
+
+    /**
+     * Display the specified resource.
+     */
+    public function show({{ module_name }} ${{ strtolower($module_name) }}): View
+    {
+        return view('{{ strtolower($module_name) }}::show', compact('{{ strtolower($module_name) }}'));
+    }
+
+    /**
+     * Show the form for editing the specified resource.
+     */
+    public function edit({{ module_name }} ${{ strtolower($module_name) }}): View
+    {
+        return view('{{ strtolower($module_name) }}::edit', compact('{{ strtolower($module_name) }}'));
+    }
+
+    /**
+     * Update the specified resource in storage.
+     */
+    public function update(Request $request, {{ module_name }} ${{ strtolower($module_name) }}): JsonResponse
+    {
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            // Add more validation rules as needed
+        ]);
+
+        $updated{{ module_name }} = $this->{{ strtolower($module_name) }}Service->update(${{ strtolower($module_name) }}, $validated);
+
+        return response()->json([
+            'message' => '{{ module_name }} updated successfully',
+            'data' => $updated{{ module_name }}
+        ]);
+    }
+
+    /**
+     * Remove the specified resource from storage.
+     */
+    public function destroy({{ module_name }} ${{ strtolower($module_name) }}): JsonResponse
+    {
+        $this->{{ strtolower($module_name) }}Service->delete(${{ strtolower($module_name) }});
+
+        return response()->json([
+            'message' => '{{ module_name }} deleted successfully'
+        ]);
+    }
+} 
