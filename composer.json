@@ -14,6 +14,9 @@
         "command",
         "query",
         "event",
+        "modular",
+        "package",
+        "module",
         "artisan",
         "scaffolding"
     ],

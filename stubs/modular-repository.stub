@@ -1,0 +1,186 @@
+<?php
+
+namespace {{ namespace }};
+
+use Illuminate\Support\Collection;
+use Illuminate\Pagination\LengthAwarePaginator;
+use {{ model_namespace }}\{{ module_name }};
+use {{ module_namespace }}\Repositories\{{ module_name }}RepositoryInterface;
+
+class {{ class_name }} implements {{ module_name }}RepositoryInterface
+{
+    protected {{ module_name }} $model;
+
+    public function __construct({{ module_name }} $model)
+    {
+        $this->model = $model;
+    }
+
+    /**
+     * Get all {{ strtolower($module_name) }}s with optional filters and pagination.
+     */
+    public function getAll(array $filters = [], int $perPage = null): Collection|LengthAwarePaginator
+    {
+        $query = $this->model->newQuery();
+
+        // Apply filters
+        if (isset($filters['status'])) {
+            $query->where('status', $filters['status']);
+        }
+
+        if (isset($filters['search'])) {
+            $query->where('name', 'like', '%' . $filters['search'] . '%')
+                  ->orWhere('description', 'like', '%' . $filters['search'] . '%');
+        }
+
+        if (isset($filters['sort_by'])) {
+            $direction = $filters['sort_direction'] ?? 'asc';
+            $query->orderBy($filters['sort_by'], $direction);
+        } else {
+            $query->orderBy('created_at', 'desc');
+        }
+
+        return $perPage ? $query->paginate($perPage) : $query->get();
+    }
+
+    /**
+     * Find a {{ strtolower($module_name) }} by ID.
+     */
+    public function findById(int $id): ?{{ module_name }}
+    {
+        return $this->model->find($id);
+    }
+
+    /**
+     * Find a {{ strtolower($module_name) }} by slug.
+     */
+    public function findBySlug(string $slug): ?{{ module_name }}
+    {
+        return $this->model->where('slug', $slug)->first();
+    }
+
+    /**
+     * Create a new {{ strtolower($module_name) }}.
+     */
+    public function create(array $data): {{ module_name }}
+    {
+        return $this->model->create($data);
+    }
+
+    /**
+     * Update an existing {{ strtolower($module_name) }}.
+     */
+    public function update({{ module_name }} ${{ strtolower($module_name) }}, array $data): {{ module_name }}
+    {
+        ${{ strtolower($module_name) }}->update($data);
+        return ${{ strtolower($module_name) }}->fresh();
+    }
+
+    /**
+     * Delete a {{ strtolower($module_name) }}.
+     */
+    public function delete({{ module_name }} ${{ strtolower($module_name) }}): bool
+    {
+        return ${{ strtolower($module_name) }}->delete();
+    }
+
+    /**
+     * Force delete a {{ strtolower($module_name) }}.
+     */
+    public function forceDelete({{ module_name }} ${{ strtolower($module_name) }}): bool
+    {
+        return ${{ strtolower($module_name) }}->forceDelete();
+    }
+
+    /**
+     * Restore a soft-deleted {{ strtolower($module_name) }}.
+     */
+    public function restore({{ module_name }} ${{ strtolower($module_name) }}): bool
+    {
+        return ${{ strtolower($module_name) }}->restore();
+    }
+
+    /**
+     * Search {{ strtolower($module_name) }}s by criteria.
+     */
+    public function search(array $criteria, int $perPage = null): Collection|LengthAwarePaginator
+    {
+        $query = $this->model->newQuery();
+
+        foreach ($criteria as $field => $value) {
+            if (is_array($value)) {
+                $query->whereIn($field, $value);
+            } else {
+                $query->where($field, $value);
+            }
+        }
+
+        return $perPage ? $query->paginate($perPage) : $query->get();
+    }
+
+    /**
+     * Get active {{ strtolower($module_name) }}s.
+     */
+    public function getActive(): Collection
+    {
+        return $this->model->active()->get();
+    }
+
+    /**
+     * Get inactive {{ strtolower($module_name) }}s.
+     */
+    public function getInactive(): Collection
+    {
+        return $this->model->inactive()->get();
+    }
+
+    /**
+     * Get {{ strtolower($module_name) }}s created in the last N days.
+     */
+    public function getRecent(int $days = 7): Collection
+    {
+        return $this->model->where('created_at', '>=', now()->subDays($days))->get();
+    }
+
+    /**
+     * Count total {{ strtolower($module_name) }}s.
+     */
+    public function count(array $filters = []): int
+    {
+        $query = $this->model->newQuery();
+
+        if (isset($filters['status'])) {
+            $query->where('status', $filters['status']);
+        }
+
+        return $query->count();
+    }
+
+    /**
+     * Check if {{ strtolower($module_name) }} exists by criteria.
+     */
+    public function exists(array $criteria): bool
+    {
+        $query = $this->model->newQuery();
+
+        foreach ($criteria as $field => $value) {
+            $query->where($field, $value);
+        }
+
+        return $query->exists();
+    }
+
+    /**
+     * Get {{ strtolower($module_name) }}s with relationships.
+     */
+    public function getWithRelations(array $relations = [], array $filters = []): Collection
+    {
+        $query = $this->model->with($relations);
+
+        if (isset($filters['status'])) {
+            $query->where('status', $filters['status']);
+        }
+
+        return $query->get();
+    }
+} 

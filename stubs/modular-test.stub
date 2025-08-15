@@ -1,0 +1,157 @@
+<?php
+
+namespace {{ namespace }};
+
+use Tests\TestCase;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\WithFaker;
+use {{ module_namespace }}\Models\{{ module_name }};
+use {{ module_namespace }}\Services\{{ module_name }}Service;
+use {{ module_namespace }}\Repositories\{{ module_name }}Repository;
+
+class {{ class_name }} extends TestCase
+{
+    use RefreshDatabase, WithFaker;
+
+    protected {{ module_name }}Service $service;
+    protected {{ module_name }}Repository $repository;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+        
+        $this->repository = new {{ module_name }}Repository(new {{ module_name }}());
+        $this->service = new {{ module_name }}Service($this->repository);
+    }
+
+    /** @test */
+    public function it_can_create_a_{{ strtolower($module_name) }}()
+    {
+        $data = [
+            'name' => $this->faker->name,
+            'description' => $this->faker->sentence,
+            'status' => 'active',
+        ];
+
+        ${{ strtolower($module_name) }} = $this->service->create($data);
+
+        $this->assertInstanceOf({{ module_name }}::class, ${{ strtolower($module_name) }});
+        $this->assertEquals($data['name'], ${{ strtolower($module_name) }}->name);
+        $this->assertEquals($data['description'], ${{ strtolower($module_name) }}->description);
+        $this->assertEquals($data['status'], ${{ strtolower($module_name) }}->status);
+    }
+
+    /** @test */
+    public function it_can_update_a_{{ strtolower($module_name) }}()
+    {
+        ${{ strtolower($module_name) }} = {{ module_name }}::factory()->create();
+        
+        $updateData = [
+            'name' => 'Updated Name',
+            'description' => 'Updated description',
+        ];
+
+        $updated{{ module_name }} = $this->service->update(${{ strtolower($module_name) }}, $updateData);
+
+        $this->assertEquals($updateData['name'], $updated{{ module_name }}->name);
+        $this->assertEquals($updateData['description'], $updated{{ module_name }}->description);
+    }
+
+    /** @test */
+    public function it_can_delete_a_{{ strtolower($module_name) }}()
+    {
+        ${{ strtolower($module_name) }} = {{ module_name }}::factory()->create();
+
+        $result = $this->service->delete(${{ strtolower($module_name) }});
+
+        $this->assertTrue($result);
+        $this->assertSoftDeleted(${{ strtolower($module_name) }});
+    }
+
+    /** @test */
+    public function it_can_find_{{ strtolower($module_name) }}_by_id()
+    {
+        ${{ strtolower($module_name) }} = {{ module_name }}::factory()->create();
+
+        $found = $this->service->findById(${{ strtolower($module_name) }}->id);
+
+        $this->assertInstanceOf({{ module_name }}::class, $found);
+        $this->assertEquals(${{ strtolower($module_name) }}->id, $found->id);
+    }
+
+    /** @test */
+    public function it_can_get_all_{{ strtolower($module_name) }}s()
+    {
+        {{ module_name }}::factory()->count(5)->create();
+
+        ${{ strtolower($module_name) }}s = $this->service->getAll();
+
+        $this->assertCount(5, ${{ strtolower($module_name) }}s);
+    }
+
+    /** @test */
+    public function it_can_get_active_{{ strtolower($module_name) }}s()
+    {
+        {{ module_name }}::factory()->count(3)->create(['status' => 'active']);
+        {{ module_name }}::factory()->count(2)->create(['status' => 'inactive']);
+
+        $active{{ module_name }}s = $this->service->getActive();
+
+        $this->assertCount(3, $active{{ module_name }}s);
+        $this->assertTrue($active{{ module_name }}s->every(fn($item) => $item->status === 'active'));
+    }
+
+    /** @test */
+    public function it_can_activate_a_{{ strtolower($module_name) }}()
+    {
+        ${{ strtolower($module_name) }} = {{ module_name }}::factory()->create(['status' => 'inactive']);
+
+        $result = $this->service->activate(${{ strtolower($module_name) }});
+
+        $this->assertTrue($result);
+        $this->assertEquals('active', ${{ strtolower($module_name) }}->fresh()->status);
+    }
+
+    /** @test */
+    public function it_can_deactivate_a_{{ strtolower($module_name) }}()
+    {
+        ${{ strtolower($module_name) }} = {{ module_name }}::factory()->create(['status' => 'active']);
+
+        $result = $this->service->deactivate(${{ strtolower($module_name) }});
+
+        $this->assertTrue($result);
+        $this->assertEquals('inactive', ${{ strtolower($module_name) }}->fresh()->status);
+    }
+
+    /** @test */
+    public function it_can_search_{{ strtolower($module_name) }}s()
+    {
+        {{ module_name }}::factory()->create(['name' => 'Test {{ module_name }}']);
+        {{ module_name }}::factory()->create(['name' => 'Another {{ module_name }}']);
+
+        $results = $this->service->search(['name' => 'Test']);
+
+        $this->assertCount(1, $results);
+        $this->assertStringContainsString('Test', $results->first()->name);
+    }
+
+    /** @test */
+    public function it_validates_required_fields_on_create()
+    {
+        $this->expectException(\Illuminate\Validation\ValidationException::class);
+
+        $this->service->create([]);
+    }
+
+    /** @test */
+    public function it_handles_pagination_correctly()
+    {
+        {{ module_name }}::factory()->count(15)->create();
+
+        $paginated = $this->service->getAll([], 10);
+
+        $this->assertInstanceOf(\Illuminate\Pagination\LengthAwarePaginator::class, $paginated);
+        $this->assertEquals(10, $paginated->perPage());
+        $this->assertEquals(15, $paginated->total());
+    }
+} 
