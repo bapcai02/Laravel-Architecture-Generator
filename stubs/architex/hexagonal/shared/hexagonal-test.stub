@@ -1,0 +1,139 @@
+<?php
+
+namespace {{ namespace }}\Tests;
+
+use {{ namespace }}\Domain\Entities\{{ class_name }};
+use {{ namespace }}\Domain\Ports\{{ class_name }}RepositoryPort;
+use {{ namespace }}\Domain\Ports\{{ class_name }}ServicePort;
+use {{ namespace }}\Application\Services\{{ class_name }}ApplicationService;
+use {{ namespace }}\Infrastructure\Adapters\{{ class_name }}RepositoryAdapter;
+use {{ namespace }}\UI\Adapters\{{ class_name }}ControllerAdapter;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\TestCase;
+
+class {{ class_name }}HexagonalTest extends TestCase
+{
+    use RefreshDatabase;
+
+    protected {{ class_name }}RepositoryPort $repository;
+    protected {{ class_name }}ServicePort $service;
+    protected {{ class_name }}ControllerAdapter $controller;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+        
+        $this->repository = new {{ class_name }}RepositoryAdapter();
+        $this->service = new {{ class_name }}ApplicationService($this->repository);
+        $this->controller = new {{ class_name }}ControllerAdapter($this->service);
+    }
+
+    /** @test */
+    public function it_can_create_a_{{ strtolower(class_name) }}()
+    {
+        $data = [
+            'name' => 'Test {{ class_name }}',
+            'description' => 'Test Description'
+        ];
+
+        ${{ strtolower(class_name) }} = $this->service->create($data);
+
+        $this->assertInstanceOf({{ class_name }}::class, ${{ strtolower(class_name) }});
+        $this->assertEquals('Test {{ class_name }}', ${{ strtolower(class_name) }}->getName());
+        $this->assertEquals('Test Description', ${{ strtolower(class_name) }}->getDescription());
+    }
+
+    /** @test */
+    public function it_can_find_a_{{ strtolower(class_name) }}_by_id()
+    {
+        $data = [
+            'name' => 'Test {{ class_name }}',
+            'description' => 'Test Description'
+        ];
+
+        $created{{ class_name }} = $this->service->create($data);
+        $found{{ class_name }} = $this->service->getById($created{{ class_name }}->getId());
+
+        $this->assertInstanceOf({{ class_name }}::class, $found{{ class_name }});
+        $this->assertEquals($created{{ class_name }}->getId(), $found{{ class_name }}->getId());
+    }
+
+    /** @test */
+    public function it_can_update_a_{{ strtolower(class_name) }}()
+    {
+        $data = [
+            'name' => 'Original Name',
+            'description' => 'Original Description'
+        ];
+
+        ${{ strtolower(class_name) }} = $this->service->create($data);
+        
+        $updateData = [
+            'name' => 'Updated Name',
+            'description' => 'Updated Description'
+        ];
+
+        $updated{{ class_name }} = $this->service->update(${{ strtolower(class_name) }}->getId(), $updateData);
+
+        $this->assertEquals('Updated Name', $updated{{ class_name }}->getName());
+        $this->assertEquals('Updated Description', $updated{{ class_name }}->getDescription());
+    }
+
+    /** @test */
+    public function it_can_delete_a_{{ strtolower(class_name) }}()
+    {
+        $data = [
+            'name' => 'Test {{ class_name }}',
+            'description' => 'Test Description'
+        ];
+
+        ${{ strtolower(class_name) }} = $this->service->create($data);
+        $deleted = $this->service->delete(${{ strtolower(class_name) }}->getId());
+
+        $this->assertTrue($deleted);
+        
+        $found{{ class_name }} = $this->service->getById(${{ strtolower(class_name) }}->getId());
+        $this->assertNull($found{{ class_name }});
+    }
+
+    /** @test */
+    public function it_can_get_all_{{ strtolower(class_name) }}s()
+    {
+        $data1 = ['name' => '{{ class_name }} 1', 'description' => 'Description 1'];
+        $data2 = ['name' => '{{ class_name }} 2', 'description' => 'Description 2'];
+
+        $this->service->create($data1);
+        $this->service->create($data2);
+
+        ${{ strtolower(class_name) }}s = $this->service->getAll();
+
+        $this->assertCount(2, ${{ strtolower(class_name) }}s);
+    }
+
+    /** @test */
+    public function it_validates_{{ strtolower(class_name) }}_data()
+    {
+        $invalidData = [
+            'name' => '', // Empty name should fail
+            'description' => 'Valid description'
+        ];
+
+        $this->expectException(\InvalidArgumentException::class);
+        $this->service->create($invalidData);
+    }
+
+    /** @test */
+    public function it_can_search_{{ strtolower(class_name) }}s()
+    {
+        $data1 = ['name' => 'Apple {{ class_name }}', 'description' => 'Description 1'];
+        $data2 = ['name' => 'Banana {{ class_name }}', 'description' => 'Description 2'];
+
+        $this->service->create($data1);
+        $this->service->create($data2);
+
+        $results = $this->service->search('Apple');
+
+        $this->assertCount(1, $results);
+        $this->assertEquals('Apple {{ class_name }}', $results[0]->getName());
+    }
+} 

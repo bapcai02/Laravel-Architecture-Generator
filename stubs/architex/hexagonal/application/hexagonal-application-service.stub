@@ -1,0 +1,113 @@
+<?php
+
+namespace {{ namespace }}\Application\Services;
+
+use {{ namespace }}\Domain\Entities\{{ class_name }};
+use {{ namespace }}\Domain\Ports\{{ class_name }}RepositoryPort;
+use {{ namespace }}\Domain\Ports\{{ class_name }}ServicePort;
+
+class {{ class_name }}ApplicationService implements {{ class_name }}ServicePort
+{
+    protected {{ class_name }}RepositoryPort $repository;
+
+    public function __construct({{ class_name }}RepositoryPort $repository)
+    {
+        $this->repository = $repository;
+    }
+
+    /**
+     * Create a new {{ strtolower(class_name) }}
+     */
+    public function create(array $data): {{ class_name }}
+    {
+        $validation = $this->validate($data);
+        if (!empty($validation)) {
+            throw new \InvalidArgumentException('Validation failed: ' . json_encode($validation));
+        }
+
+        ${{ strtolower(class_name) }} = new {{ class_name }}(
+            null,
+            $data['name'] ?? '',
+            $data['description'] ?? ''
+        );
+
+        return $this->repository->save(${{ strtolower(class_name) }});
+    }
+
+    /**
+     * Update an existing {{ strtolower(class_name) }}
+     */
+    public function update(int $id, array $data): {{ class_name }}
+    {
+        ${{ strtolower(class_name) }} = $this->repository->findById($id);
+        if (!${{ strtolower(class_name) }}) {
+            throw new \InvalidArgumentException('{{ class_name }} not found');
+        }
+
+        if (isset($data['name'])) {
+            ${{ strtolower(class_name) }}->setName($data['name']);
+        }
+        if (isset($data['description'])) {
+            ${{ strtolower(class_name) }}->setDescription($data['description']);
+        }
+
+        return $this->repository->save(${{ strtolower(class_name) }});
+    }
+
+    /**
+     * Delete a {{ strtolower(class_name) }}
+     */
+    public function delete(int $id): bool
+    {
+        ${{ strtolower(class_name) }} = $this->repository->findById($id);
+        if (!${{ strtolower(class_name) }}) {
+            return false;
+        }
+
+        return $this->repository->delete(${{ strtolower(class_name) }});
+    }
+
+    /**
+     * Get a {{ strtolower(class_name) }} by ID
+     */
+    public function getById(int $id): ?{{ class_name }}
+    {
+        return $this->repository->findById($id);
+    }
+
+    /**
+     * Get all {{ strtolower(class_name) }}s
+     */
+    public function getAll(): array
+    {
+        return $this->repository->findAll();
+    }
+
+    /**
+     * Search {{ strtolower(class_name) }}s
+     */
+    public function search(string $query): array
+    {
+        return $this->repository->findBy(['name' => $query]);
+    }
+
+    /**
+     * Validate {{ strtolower(class_name) }} data
+     */
+    public function validate(array $data): array
+    {
+        $errors = [];
+
+        if (empty($data['name'])) {
+            $errors['name'] = 'Name is required';
+        } elseif (strlen($data['name']) > 255) {
+            $errors['name'] = 'Name must be less than 255 characters';
+        }
+
+        if (isset($data['description']) && strlen($data['description']) > 1000) {
+            $errors['description'] = 'Description must be less than 1000 characters';
+        }
+
+        return $errors;
+    }
+} 

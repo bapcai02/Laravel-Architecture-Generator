@@ -1,0 +1,12 @@
+<?php
+
+use {{ module_namespace }}\Controllers\{{ module_name }}Controller;
+use Illuminate\Support\Facades\Route;
+
+Route::prefix('{{ strtolower($module_name) }}')->group(function () {
+    Route::get('/', [{{ module_name }}Controller::class, 'index'])->name('{{ strtolower($module_name) }}.index');
+    Route::post('/', [{{ module_name }}Controller::class, 'store'])->name('{{ strtolower($module_name) }}.store');
+    Route::get('/{id}', [{{ module_name }}Controller::class, 'show'])->name('{{ strtolower($module_name) }}.show');
+    Route::put('/{id}', [{{ module_name }}Controller::class, 'update'])->name('{{ strtolower($module_name) }}.update');
+    Route::delete('/{id}', [{{ module_name }}Controller::class, 'destroy'])->name('{{ strtolower($module_name) }}.destroy');
+}); 

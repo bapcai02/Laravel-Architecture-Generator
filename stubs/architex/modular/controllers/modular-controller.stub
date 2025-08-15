@@ -1,0 +1,148 @@
+<?php
+
+namespace {{ namespace }}\Controllers;
+
+use Illuminate\Http\Request;
+use Illuminate\Http\JsonResponse;
+use {{ namespace }}\Services\{{ class_name }}Service;
+use {{ namespace }}\Repositories\{{ class_name }}Repository;
+
+class {{ class_name }}Controller
+{
+    protected {{ class_name }}Service $service;
+    protected {{ class_name }}Repository $repository;
+
+    public function __construct({{ class_name }}Service $service, {{ class_name }}Repository $repository)
+    {
+        $this->service = $service;
+        $this->repository = $repository;
+    }
+
+    /**
+     * Display a listing of {{ strtolower(class_name) }}s
+     */
+    public function index(): JsonResponse
+    {
+        try {
+            ${{ strtolower(class_name) }}s = $this->service->getAll();
+            
+            return response()->json([
+                'success' => true,
+                'data' => ${{ strtolower(class_name) }}s,
+                'message' => '{{ class_name }}s retrieved successfully'
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error retrieving {{ strtolower(class_name) }}s: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Store a newly created {{ strtolower(class_name) }}
+     */
+    public function store(Request $request): JsonResponse
+    {
+        try {
+            $data = $request->validate([
+                'name' => 'required|string|max:255',
+                'description' => 'nullable|string|max:1000',
+            ]);
+
+            ${{ strtolower(class_name) }} = $this->service->create($data);
+            
+            return response()->json([
+                'success' => true,
+                'data' => ${{ strtolower(class_name) }},
+                'message' => '{{ class_name }} created successfully'
+            ], 201);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error creating {{ strtolower(class_name) }}: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Display the specified {{ strtolower(class_name) }}
+     */
+    public function show(int $id): JsonResponse
+    {
+        try {
+            ${{ strtolower(class_name) }} = $this->service->getById($id);
+            
+            if (!${{ strtolower(class_name) }}) {
+                return response()->json([
+                    'success' => false,
+                    'message' => '{{ class_name }} not found'
+                ], 404);
+            }
+            
+            return response()->json([
+                'success' => true,
+                'data' => ${{ strtolower(class_name) }},
+                'message' => '{{ class_name }} retrieved successfully'
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error retrieving {{ strtolower(class_name) }}: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Update the specified {{ strtolower(class_name) }}
+     */
+    public function update(Request $request, int $id): JsonResponse
+    {
+        try {
+            $data = $request->validate([
+                'name' => 'sometimes|required|string|max:255',
+                'description' => 'nullable|string|max:1000',
+            ]);
+
+            ${{ strtolower(class_name) }} = $this->service->update($id, $data);
+            
+            return response()->json([
+                'success' => true,
+                'data' => ${{ strtolower(class_name) }},
+                'message' => '{{ class_name }} updated successfully'
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error updating {{ strtolower(class_name) }}: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Remove the specified {{ strtolower(class_name) }}
+     */
+    public function destroy(int $id): JsonResponse
+    {
+        try {
+            $deleted = $this->service->delete($id);
+            
+            if (!$deleted) {
+                return response()->json([
+                    'success' => false,
+                    'message' => '{{ class_name }} not found'
+                ], 404);
+            }
+            
+            return response()->json([
+                'success' => true,
+                'message' => '{{ class_name }} deleted successfully'
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error deleting {{ strtolower(class_name) }}: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+} 

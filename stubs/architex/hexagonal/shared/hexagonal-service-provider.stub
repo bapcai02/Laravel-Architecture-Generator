@@ -1,0 +1,51 @@
+<?php
+
+namespace {{ namespace }};
+
+use {{ namespace }}\Domain\Ports\{{ class_name }}RepositoryPort;
+use {{ namespace }}\Domain\Ports\{{ class_name }}ServicePort;
+use {{ namespace }}\Application\Services\{{ class_name }}ApplicationService;
+use {{ namespace }}\Infrastructure\Adapters\{{ class_name }}RepositoryAdapter;
+use {{ namespace }}\UI\Adapters\{{ class_name }}ControllerAdapter;
+use Illuminate\Support\ServiceProvider;
+
+class {{ class_name }}ServiceProvider extends ServiceProvider
+{
+    /**
+     * Register services.
+     */
+    public function register(): void
+    {
+        // Bind Repository Port to Infrastructure Adapter
+        $this->app->bind({{ class_name }}RepositoryPort::class, {{ class_name }}RepositoryAdapter::class);
+        
+        // Bind Service Port to Application Service
+        $this->app->bind({{ class_name }}ServicePort::class, {{ class_name }}ApplicationService::class);
+        
+        // Bind Controller Adapter
+        $this->app->bind({{ class_name }}ControllerAdapter::class, function ($app) {
+            return new {{ class_name }}ControllerAdapter(
+                $app->make({{ class_name }}ServicePort::class)
+            );
+        });
+    }
+
+    /**
+     * Bootstrap services.
+     */
+    public function boot(): void
+    {
+        // Load routes
+        $this->loadRoutesFrom(__DIR__ . '/UI/routes/{{ strtolower(class_name) }}_routes.php');
+        
+        // Load migrations
+        if ($this->app->runningInConsole()) {
+            $this->loadMigrationsFrom(__DIR__ . '/Infrastructure/database/migrations');
+        }
+        
+        // Load config
+        $this->publishes([
+            __DIR__ . '/config/{{ strtolower(class_name) }}.php' => config_path('{{ strtolower(class_name) }}.php'),
+        ], '{{ strtolower(class_name) }}-config');
+    }
+} 

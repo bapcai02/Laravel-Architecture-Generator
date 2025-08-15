@@ -125,6 +125,26 @@ return [
                 'with_assets' => false,
             ],
         ],
+        'hexagonal' => [
+            'enabled' => true,
+            'base_path' => 'app/Hexagonal',
+            'base_namespace' => 'App\\Hexagonal',
+            'structure' => [
+                'Domain/Entities',
+                'Domain/Ports',
+                'Application/Services',
+                'Infrastructure/Adapters',
+                'Infrastructure/database/migrations',
+                'UI/Adapters',
+                'UI/routes',
+                'Tests',
+            ],
+            'default_options' => [
+                'with_tests' => true,
+                'with_migrations' => true,
+                'with_routes' => true,
+            ],
+        ],
     ],
 
     /*
