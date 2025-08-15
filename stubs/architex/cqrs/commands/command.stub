@@ -1,8 +1,8 @@
 <?php
 
-namespace {{namespace}};
+namespace {{ namespace }};
 
-class {{class_name}}
+class {{ class_name }}
 {
     protected $name;
     protected $description;

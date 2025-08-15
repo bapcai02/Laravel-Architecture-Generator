@@ -11,6 +11,7 @@ Laravel Architex is a powerful tool that helps Laravel developers quickly initia
 - **CQRS (Command Query Responsibility Segregation)** - Create commands, queries and handlers
 - **Event Bus** - Create events and listeners
 - **Modular/Package-based Architecture** - Create complete module structure with controllers, models, services, repositories, routes, config, tests, and more
+- **Hexagonal Architecture (Ports and Adapters)** - Create clean architecture with domain isolation, ports, and adapters
 
 ### Additional Features:
 - ✅ Configurable naming conventions (class names, interfaces, namespaces, folder structure)
@@ -497,6 +498,63 @@ app/Modules/UserManagement/
 - ✅ Service provider for module registration
 - ✅ Optional view templates and assets
 - ✅ Documentation and usage examples
+
+### 7. Hexagonal Architecture (Ports and Adapters)
+
+```bash
+# Create complete hexagonal structure
+php artisan architex:hexagonal User
+
+# Create with specific options
+php artisan architex:hexagonal User --with-tests --with-migrations --with-routes
+
+# Create with custom path and namespace
+php artisan architex:hexagonal User --path=app/Hexagonal --namespace=App\\Hexagonal
+
+# Create with all features
+php artisan architex:hexagonal User --with-tests --with-migrations --with-routes --with-config
+
+# Overwrite existing files
+php artisan architex:hexagonal User --force
+```
+
+**Result:**
+```
+app/Hexagonal/User/
+├── Domain/
+│   ├── Entities/
+│   │   └── User.php
+│   └── Ports/
+│       ├── UserRepositoryPort.php
+│       └── UserServicePort.php
+├── Application/
+│   └── Services/
+│       └── UserApplicationService.php
+├── Infrastructure/
+│   ├── Adapters/
+│   │   └── UserRepositoryAdapter.php
+│   └── database/migrations/
+│       └── create_users_table.php
+├── UI/
+│   ├── Adapters/
+│   │   └── UserControllerAdapter.php
+│   └── routes/
+│       └── user_routes.php
+├── Tests/
+│   └── UserHexagonalTest.php
+└── UserServiceProvider.php
+```
+
+**Features:**
+- ✅ Domain entities with business logic
+- ✅ Port interfaces for dependency inversion
+- ✅ Application services for use cases
+- ✅ Infrastructure adapters for external concerns
+- ✅ UI adapters for primary ports
+- ✅ Service provider for dependency injection
+- ✅ Database migrations and tests
+- ✅ Route management
+- ✅ Clean separation of concerns
 
 ## ⚙️ Configuration
 

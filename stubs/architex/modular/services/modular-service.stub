@@ -17,7 +17,7 @@ class {{ class_name }}
     }
 
     /**
-     * Get all {{ strtolower($module_name) }}s with optional pagination.
+     * Get all {{ strtolower(class_name) }}s with optional pagination.
      */
     public function getAll(array $filters = [], int $perPage = null): Collection|LengthAwarePaginator
     {
@@ -25,7 +25,7 @@ class {{ class_name }}
     }
 
     /**
-     * Find a {{ strtolower($module_name) }} by ID.
+     * Find a {{ strtolower(class_name) }} by ID.
      */
     public function findById(int $id): ?{{ module_name }}
     {
@@ -33,7 +33,7 @@ class {{ class_name }}
     }
 
     /**
-     * Find a {{ strtolower($module_name) }} by slug.
+     * Find a {{ strtolower(class_name) }} by slug.
      */
     public function findBySlug(string $slug): ?{{ module_name }}
     {
@@ -41,7 +41,7 @@ class {{ class_name }}
     }
 
     /**
-     * Create a new {{ strtolower($module_name) }}.
+     * Create a new {{ strtolower(class_name) }}.
      */
     public function create(array $data): {{ module_name }}
     {
@@ -52,45 +52,45 @@ class {{ class_name }}
     }
 
     /**
-     * Update an existing {{ strtolower($module_name) }}.
+     * Update an existing {{ strtolower(class_name) }}.
      */
-    public function update({{ module_name }} ${{ strtolower($module_name) }}, array $data): {{ module_name }}
+    public function update({{ module_name }} ${{ strtolower(class_name) }}, array $data): {{ module_name }}
     {
         // Apply business logic before update
         $data = $this->prepareDataForUpdate($data);
         
-        return $this->repository->update(${{ strtolower($module_name) }}, $data);
+        return $this->repository->update(${{ strtolower(class_name) }}, $data);
     }
 
     /**
-     * Delete a {{ strtolower($module_name) }}.
+     * Delete a {{ strtolower(class_name) }}.
      */
-    public function delete({{ module_name }} ${{ strtolower($module_name) }}): bool
+    public function delete({{ module_name }} ${{ strtolower(class_name) }}): bool
     {
         // Apply business logic before deletion
-        $this->validateDeletion(${{ strtolower($module_name) }});
+        $this->validateDeletion(${{ strtolower(class_name) }});
         
-        return $this->repository->delete(${{ strtolower($module_name) }});
+        return $this->repository->delete(${{ strtolower(class_name) }});
     }
 
     /**
-     * Activate a {{ strtolower($module_name) }}.
+     * Activate a {{ strtolower(class_name) }}.
      */
-    public function activate({{ module_name }} ${{ strtolower($module_name) }}): bool
+    public function activate({{ module_name }} ${{ strtolower(class_name) }}): bool
     {
-        return $this->repository->update(${{ strtolower($module_name) }}, ['status' => 'active']);
+        return $this->repository->update(${{ strtolower(class_name) }}, ['status' => 'active']);
     }
 
     /**
-     * Deactivate a {{ strtolower($module_name) }}.
+     * Deactivate a {{ strtolower(class_name) }}.
      */
-    public function deactivate({{ module_name }} ${{ strtolower($module_name) }}): bool
+    public function deactivate({{ module_name }} ${{ strtolower(class_name) }}): bool
     {
-        return $this->repository->update(${{ strtolower($module_name) }}, ['status' => 'inactive']);
+        return $this->repository->update(${{ strtolower(class_name) }}, ['status' => 'inactive']);
     }
 
     /**
-     * Search {{ strtolower($module_name) }}s by criteria.
+     * Search {{ strtolower(class_name) }}s by criteria.
      */
     public function search(array $criteria, int $perPage = null): Collection|LengthAwarePaginator
     {
@@ -98,7 +98,7 @@ class {{ class_name }}
     }
 
     /**
-     * Get active {{ strtolower($module_name) }}s.
+     * Get active {{ strtolower(class_name) }}s.
      */
     public function getActive(): Collection
     {
@@ -106,7 +106,7 @@ class {{ class_name }}
     }
 
     /**
-     * Get inactive {{ strtolower($module_name) }}s.
+     * Get inactive {{ strtolower(class_name) }}s.
      */
     public function getInactive(): Collection
     {
@@ -137,12 +137,12 @@ class {{ class_name }}
     }
 
     /**
-     * Validate if {{ strtolower($module_name) }} can be deleted.
+     * Validate if {{ strtolower(class_name) }} can be deleted.
      */
-    protected function validateDeletion({{ module_name }} ${{ strtolower($module_name) }}): void
+    protected function validateDeletion({{ module_name }} ${{ strtolower(class_name) }}): void
     {
         // Add validation logic here
-        // For example, check if {{ strtolower($module_name) }} has related records
-        // throw new \Exception('Cannot delete {{ strtolower($module_name) }} with related records');
+        // For example, check if {{ strtolower(class_name) }} has related records
+        // throw new \Exception('Cannot delete {{ strtolower(class_name) }} with related records');
     }
 } 

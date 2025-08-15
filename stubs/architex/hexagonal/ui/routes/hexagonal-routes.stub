@@ -1,0 +1,13 @@
+<?php
+
+use {{ namespace }}\UI\Adapters\{{ class_name }}ControllerAdapter;
+use Illuminate\Support\Facades\Route;
+
+Route::prefix('api/{{ strtolower(class_name) }}s')->group(function () {
+    Route::get('/', [{{ class_name }}ControllerAdapter::class, 'index']);
+    Route::post('/', [{{ class_name }}ControllerAdapter::class, 'store']);
+    Route::get('/search', [{{ class_name }}ControllerAdapter::class, 'search']);
+    Route::get('/{id}', [{{ class_name }}ControllerAdapter::class, 'show']);
+    Route::put('/{id}', [{{ class_name }}ControllerAdapter::class, 'update']);
+    Route::delete('/{id}', [{{ class_name }}ControllerAdapter::class, 'destroy']);
+}); 

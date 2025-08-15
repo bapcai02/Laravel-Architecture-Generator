@@ -17,7 +17,7 @@ class {{ class_name }} implements {{ module_name }}RepositoryInterface
     }
 
     /**
-     * Get all {{ strtolower($module_name) }}s with optional filters and pagination.
+     * Get all {{ strtolower(class_name) }}s with optional filters and pagination.
      */
     public function getAll(array $filters = [], int $perPage = null): Collection|LengthAwarePaginator
     {
@@ -44,7 +44,7 @@ class {{ class_name }} implements {{ module_name }}RepositoryInterface
     }
 
     /**
-     * Find a {{ strtolower($module_name) }} by ID.
+     * Find a {{ strtolower(class_name) }} by ID.
      */
     public function findById(int $id): ?{{ module_name }}
     {
@@ -52,7 +52,7 @@ class {{ class_name }} implements {{ module_name }}RepositoryInterface
     }
 
     /**
-     * Find a {{ strtolower($module_name) }} by slug.
+     * Find a {{ strtolower(class_name) }} by slug.
      */
     public function findBySlug(string $slug): ?{{ module_name }}
     {
@@ -60,7 +60,7 @@ class {{ class_name }} implements {{ module_name }}RepositoryInterface
     }
 
     /**
-     * Create a new {{ strtolower($module_name) }}.
+     * Create a new {{ strtolower(class_name) }}.
      */
     public function create(array $data): {{ module_name }}
     {
@@ -68,40 +68,40 @@ class {{ class_name }} implements {{ module_name }}RepositoryInterface
     }
 
     /**
-     * Update an existing {{ strtolower($module_name) }}.
+     * Update an existing {{ strtolower(class_name) }}.
      */
-    public function update({{ module_name }} ${{ strtolower($module_name) }}, array $data): {{ module_name }}
+    public function update({{ module_name }} ${{ strtolower(class_name) }}, array $data): {{ module_name }}
     {
-        ${{ strtolower($module_name) }}->update($data);
-        return ${{ strtolower($module_name) }}->fresh();
+        ${{ strtolower(class_name) }}->update($data);
+        return ${{ strtolower(class_name) }}->fresh();
     }
 
     /**
-     * Delete a {{ strtolower($module_name) }}.
+     * Delete a {{ strtolower(class_name) }}.
      */
-    public function delete({{ module_name }} ${{ strtolower($module_name) }}): bool
+    public function delete({{ module_name }} ${{ strtolower(class_name) }}): bool
     {
-        return ${{ strtolower($module_name) }}->delete();
+        return ${{ strtolower(class_name) }}->delete();
     }
 
     /**
-     * Force delete a {{ strtolower($module_name) }}.
+     * Force delete a {{ strtolower(class_name) }}.
      */
-    public function forceDelete({{ module_name }} ${{ strtolower($module_name) }}): bool
+    public function forceDelete({{ module_name }} ${{ strtolower(class_name) }}): bool
     {
-        return ${{ strtolower($module_name) }}->forceDelete();
+        return ${{ strtolower(class_name) }}->forceDelete();
     }
 
     /**
-     * Restore a soft-deleted {{ strtolower($module_name) }}.
+     * Restore a soft-deleted {{ strtolower(class_name) }}.
      */
-    public function restore({{ module_name }} ${{ strtolower($module_name) }}): bool
+    public function restore({{ module_name }} ${{ strtolower(class_name) }}): bool
     {
-        return ${{ strtolower($module_name) }}->restore();
+        return ${{ strtolower(class_name) }}->restore();
     }
 
     /**
-     * Search {{ strtolower($module_name) }}s by criteria.
+     * Search {{ strtolower(class_name) }}s by criteria.
      */
     public function search(array $criteria, int $perPage = null): Collection|LengthAwarePaginator
     {
@@ -119,7 +119,7 @@ class {{ class_name }} implements {{ module_name }}RepositoryInterface
     }
 
     /**
-     * Get active {{ strtolower($module_name) }}s.
+     * Get active {{ strtolower(class_name) }}s.
      */
     public function getActive(): Collection
     {
@@ -127,7 +127,7 @@ class {{ class_name }} implements {{ module_name }}RepositoryInterface
     }
 
     /**
-     * Get inactive {{ strtolower($module_name) }}s.
+     * Get inactive {{ strtolower(class_name) }}s.
      */
     public function getInactive(): Collection
     {
@@ -135,7 +135,7 @@ class {{ class_name }} implements {{ module_name }}RepositoryInterface
     }
 
     /**
-     * Get {{ strtolower($module_name) }}s created in the last N days.
+     * Get {{ strtolower(class_name) }}s created in the last N days.
      */
     public function getRecent(int $days = 7): Collection
     {
@@ -143,7 +143,7 @@ class {{ class_name }} implements {{ module_name }}RepositoryInterface
     }
 
     /**
-     * Count total {{ strtolower($module_name) }}s.
+     * Count total {{ strtolower(class_name) }}s.
      */
     public function count(array $filters = []): int
     {
@@ -157,7 +157,7 @@ class {{ class_name }} implements {{ module_name }}RepositoryInterface
     }
 
     /**
-     * Check if {{ strtolower($module_name) }} exists by criteria.
+     * Check if {{ strtolower(class_name) }} exists by criteria.
      */
     public function exists(array $criteria): bool
     {
@@ -171,7 +171,7 @@ class {{ class_name }} implements {{ module_name }}RepositoryInterface
     }
 
     /**
-     * Get {{ strtolower($module_name) }}s with relationships.
+     * Get {{ strtolower(class_name) }}s with relationships.
      */
     public function getWithRelations(array $relations = [], array $filters = []): Collection
     {

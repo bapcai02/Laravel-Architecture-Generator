@@ -17,6 +17,9 @@
         "modular",
         "package",
         "module",
+        "hexagonal",
+        "ports",
+        "adapters",
         "artisan",
         "scaffolding"
     ],

@@ -11,6 +11,7 @@ use LaravelArchitex\Console\Commands\MakeQueryCommand;
 use LaravelArchitex\Console\Commands\MakeDDDCommand;
 use LaravelArchitex\Console\Commands\MakeCQRSCommand;
 use LaravelArchitex\Console\Commands\MakeModularCommand;
+use LaravelArchitex\Console\Commands\MakeHexagonalCommand;
 use LaravelArchitex\Services\ArchitectureGenerator;
 use LaravelArchitex\Services\TemplateEngine;
 
@@ -44,6 +45,7 @@ class ArchitexServiceProvider extends ServiceProvider
                 MakeDDDCommand::class,
                 MakeCQRSCommand::class,
                 MakeModularCommand::class,
+                MakeHexagonalCommand::class,
             ]);
 
             $this->publishes([

@@ -1,0 +1,43 @@
+<?php
+
+namespace {{ namespace }}\Domain\Ports;
+
+use {{ namespace }}\Domain\Entities\{{ class_name }};
+
+interface {{ class_name }}ServicePort
+{
+    /**
+     * Create a new {{ strtolower(class_name) }}
+     */
+    public function create(array $data): {{ class_name }};
+
+    /**
+     * Update an existing {{ strtolower(class_name) }}
+     */
+    public function update(int $id, array $data): {{ class_name }};
+
+    /**
+     * Delete a {{ strtolower(class_name) }}
+     */
+    public function delete(int $id): bool;
+
+    /**
+     * Get a {{ strtolower(class_name) }} by ID
+     */
+    public function getById(int $id): ?{{ class_name }};
+
+    /**
+     * Get all {{ strtolower(class_name) }}s
+     */
+    public function getAll(): array;
+
+    /**
+     * Search {{ strtolower(class_name) }}s
+     */
+    public function search(string $query): array;
+
+    /**
+     * Validate {{ strtolower(class_name) }} data
+     */
+    public function validate(array $data): array;
+} 

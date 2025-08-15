@@ -1,0 +1,137 @@
+<?php
+
+namespace {{ namespace }}\Infrastructure\Adapters;
+
+use {{ namespace }}\Domain\Entities\{{ class_name }};
+use {{ namespace }}\Domain\Ports\{{ class_name }}RepositoryPort;
+use Illuminate\Support\Facades\DB;
+
+class {{ class_name }}RepositoryAdapter implements {{ class_name }}RepositoryPort
+{
+    protected string $table = '{{ strtolower(class_name) }}s';
+
+    /**
+     * Find a {{ strtolower(class_name) }} by ID
+     */
+    public function findById(int $id): ?{{ class_name }}
+    {
+        $data = DB::table($this->table)->where('id', $id)->first();
+        
+        if (!$data) {
+            return null;
+        }
+
+        return new {{ class_name }}(
+            $data->id,
+            $data->name,
+            $data->description,
+            $data->created_at,
+            $data->updated_at
+        );
+    }
+
+    /**
+     * Find all {{ strtolower(class_name) }}s
+     */
+    public function findAll(): array
+    {
+        $data = DB::table($this->table)->get();
+        
+        return $data->map(function ($item) {
+            return new {{ class_name }}(
+                $item->id,
+                $item->name,
+                $item->description,
+                $item->created_at,
+                $item->updated_at
+            );
+        })->toArray();
+    }
+
+    /**
+     * Save a {{ strtolower(class_name) }}
+     */
+    public function save({{ class_name }} ${{ strtolower(class_name) }}): {{ class_name }}
+    {
+        $data = [
+            'name' => ${{ strtolower(class_name) }}->getName(),
+            'description' => ${{ strtolower(class_name) }}->getDescription(),
+            'updated_at' => now(),
+        ];
+
+        if (${{ strtolower(class_name) }}->getId()) {
+            // Update existing
+            DB::table($this->table)
+                ->where('id', ${{ strtolower(class_name) }}->getId())
+                ->update($data);
+            
+            return $this->findById(${{ strtolower(class_name) }}->getId());
+        } else {
+            // Create new
+            $data['created_at'] = now();
+            $id = DB::table($this->table)->insertGetId($data);
+            
+            return $this->findById($id);
+        }
+    }
+
+    /**
+     * Delete a {{ strtolower(class_name) }}
+     */
+    public function delete({{ class_name }} ${{ strtolower(class_name) }}): bool
+    {
+        return DB::table($this->table)
+            ->where('id', ${{ strtolower(class_name) }}->getId())
+            ->delete() > 0;
+    }
+
+    /**
+     * Find {{ strtolower(class_name) }}s by criteria
+     */
+    public function findBy(array $criteria): array
+    {
+        $query = DB::table($this->table);
+        
+        foreach ($criteria as $field => $value) {
+            $query->where($field, 'like', "%{$value}%");
+        }
+        
+        $data = $query->get();
+        
+        return $data->map(function ($item) {
+            return new {{ class_name }}(
+                $item->id,
+                $item->name,
+                $item->description,
+                $item->created_at,
+                $item->updated_at
+            );
+        })->toArray();
+    }
+
+    /**
+     * Find one {{ strtolower(class_name) }} by criteria
+     */
+    public function findOneBy(array $criteria): ?{{ class_name }}
+    {
+        $query = DB::table($this->table);
+        
+        foreach ($criteria as $field => $value) {
+            $query->where($field, $value);
+        }
+        
+        $data = $query->first();
+        
+        if (!$data) {
+            return null;
+        }
+
+        return new {{ class_name }}(
+            $data->id,
+            $data->name,
+            $data->description,
+            $data->created_at,
+            $data->updated_at
+        );
+    }
+} 

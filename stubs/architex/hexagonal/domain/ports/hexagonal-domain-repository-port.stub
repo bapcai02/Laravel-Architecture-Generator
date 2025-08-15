@@ -1,0 +1,38 @@
+<?php
+
+namespace {{ namespace }}\Domain\Ports;
+
+use {{ namespace }}\Domain\Entities\{{ class_name }};
+
+interface {{ class_name }}RepositoryPort
+{
+    /**
+     * Find a {{ strtolower(class_name) }} by ID
+     */
+    public function findById(int $id): ?{{ class_name }};
+
+    /**
+     * Find all {{ strtolower(class_name) }}s
+     */
+    public function findAll(): array;
+
+    /**
+     * Save a {{ strtolower(class_name) }}
+     */
+    public function save({{ class_name }} ${{ strtolower(class_name) }}): {{ class_name }};
+
+    /**
+     * Delete a {{ strtolower(class_name) }}
+     */
+    public function delete({{ class_name }} ${{ strtolower(class_name) }}): bool;
+
+    /**
+     * Find {{ strtolower(class_name) }}s by criteria
+     */
+    public function findBy(array $criteria): array;
+
+    /**
+     * Find one {{ strtolower(class_name) }} by criteria
+     */
+    public function findOneBy(array $criteria): ?{{ class_name }};
+} 

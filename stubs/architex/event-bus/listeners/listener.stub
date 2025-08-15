@@ -1,0 +1,59 @@
+<?php
+
+namespace {{ namespace }};
+
+use {{ event_namespace }}\{{ event_class }};
+use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Queue\InteractsWithQueue;
+
+class {{ class_name }}
+{
+    use InteractsWithQueue;
+
+    /**
+     * Create the event listener.
+     *
+     * @return void
+     */
+    public function __construct()
+    {
+        //
+    }
+
+    /**
+     * Handle the event.
+     *
+     * @param  {{ event_class }}  $event
+     * @return void
+     */
+    public function handle({{ event_class }} $event)
+    {
+        // Handle the event logic here
+        $data = $event->data;
+        
+        // Example: Log the event
+        \Log::info('{{ event_class }} handled', ['data' => $data]);
+        
+        // Example: Send notification
+        // $this->sendNotification($data);
+        
+        // Example: Update database
+        // $this->updateDatabase($data);
+    }
+
+    /**
+     * Send notification
+     */
+    protected function sendNotification($data)
+    {
+        // Implementation for sending notification
+    }
+
+    /**
+     * Update database
+     */
+    protected function updateDatabase($data)
+    {
+        // Implementation for updating database
+    }
+} 

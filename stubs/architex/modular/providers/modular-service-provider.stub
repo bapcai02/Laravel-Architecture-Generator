@@ -33,19 +33,19 @@ class {{ class_name }} extends ServiceProvider
 
         @if($with_views)
         // Load module views
-        $this->loadViewsFrom(__DIR__ . '/../Views', '{{ strtolower($module_name) }}');
+        $this->loadViewsFrom(__DIR__ . '/../Views', '{{ strtolower(class_name) }}');
         @endif
 
         @if($with_assets)
         // Publish module assets
         $this->publishes([
-            __DIR__ . '/../Assets' => public_path('modules/{{ strtolower($module_name) }}'),
-        ], '{{ strtolower($module_name) }}-assets');
+            __DIR__ . '/../Assets' => public_path('modules/{{ strtolower(class_name) }}'),
+        ], '{{ strtolower(class_name) }}-assets');
         @endif
 
         // Publish module config
         $this->publishes([
-            __DIR__ . '/../Config/{{ strtolower($module_name) }}.php' => config_path('{{ strtolower($module_name) }}.php'),
-        ], '{{ strtolower($module_name) }}-config');
+            __DIR__ . '/../Config/{{ strtolower(class_name) }}.php' => config_path('{{ strtolower(class_name) }}.php'),
+        ], '{{ strtolower(class_name) }}-config');
     }
 } 

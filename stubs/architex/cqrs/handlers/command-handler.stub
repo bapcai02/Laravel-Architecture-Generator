@@ -1,0 +1,44 @@
+<?php
+
+namespace {{ namespace }};
+
+use {{ command_namespace }}\{{ command_class }};
+
+class {{ class_name }}
+{
+    /**
+     * Handle the command.
+     *
+     * @param {{ command_class }} $command
+     * @return mixed
+     */
+    public function handle({{ command_class }} $command)
+    {
+        // Extract data from command
+        $data = $command->getData();
+        $name = $command->getName();
+        $description = $command->getDescription();
+
+        // Example: Create a new record
+        // $model = new \App\Models\{{ model_name }}();
+        // $model->fill($data);
+        // $model->save();
+
+        // Example: Update existing record
+        // $model = \App\Models\{{ model_name }}::find($data['id']);
+        // $model->update($data);
+
+        // Example: Delete record
+        // \App\Models\{{ model_name }}::destroy($data['id']);
+
+        // Example: Send notification
+        // event(new \App\Events\{{ event_class }}($data));
+
+        // Return result
+        return [
+            'success' => true,
+            'message' => '{{ command_class }} handled successfully',
+            'data' => $data
+        ];
+    }
+} 
