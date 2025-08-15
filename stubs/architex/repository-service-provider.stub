@@ -1,0 +1,70 @@
+<?php
+
+namespace {{namespace}};
+
+use Illuminate\Support\ServiceProvider;
+use {{base_namespace}}\RepositoryService;
+use {{base_namespace}}\Repository;
+
+/**
+ * Class RepositoryServiceProvider
+ *
+ * @package {{namespace}}
+ */
+class RepositoryServiceProvider extends ServiceProvider
+{
+    /**
+     * Register services.
+     *
+     * @return void
+     */
+    public function register()
+    {
+        // Register RepositoryService as singleton
+        $this->app->singleton('repository', function ($app) {
+            return new RepositoryService();
+        });
+
+        // Register Repository Facade
+        $this->app->singleton('repository.facade', function ($app) {
+            return new Repository();
+        });
+
+        // Bind RepositoryService to interface
+        $this->app->bind(RepositoryService::class, function ($app) {
+            return $app->make('repository');
+        });
+    }
+
+    /**
+     * Bootstrap services.
+     *
+     * @return void
+     */
+    public function boot()
+    {
+        // Publish configuration
+        $this->publishes([
+            __DIR__ . '/../config/repository.php' => config_path('repository.php'),
+        ], 'repository-config');
+
+        // Publish stubs
+        $this->publishes([
+            __DIR__ . '/../stubs' => base_path('stubs/architex'),
+        ], 'repository-stubs');
+    }
+
+    /**
+     * Get the services provided by the provider.
+     *
+     * @return array
+     */
+    public function provides()
+    {
+        return [
+            'repository',
+            'repository.facade',
+            RepositoryService::class,
+        ];
+    }
+} 

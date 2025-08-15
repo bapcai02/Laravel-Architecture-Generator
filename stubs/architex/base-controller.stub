@@ -1,0 +1,491 @@
+<?php
+
+namespace {{namespace}};
+
+use Illuminate\Http\Request;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Response;
+use Illuminate\Routing\Controller;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Cache;
+use Exception;
+
+/**
+ * Class BaseController
+ *
+ * @package {{namespace}}
+ */
+abstract class BaseController extends Controller
+{
+    /**
+     * @var BaseService
+     */
+    protected $service;
+
+    /**
+     * @var string
+     */
+    protected $modelClass;
+
+    /**
+     * @var array
+     */
+    protected $validationRules = [];
+
+    /**
+     * @var array
+     */
+    protected $searchableFields = [];
+
+    /**
+     * @var array
+     */
+    protected $allowedFilters = [];
+
+    /**
+     * @var array
+     */
+    protected $allowedSorts = [];
+
+    /**
+     * @var array
+     */
+    protected $allowedIncludes = [];
+
+    /**
+     * @var int
+     */
+    protected $defaultPerPage = 15;
+
+    /**
+     * @var int
+     */
+    protected $maxPerPage = 100;
+
+    /**
+     * BaseController constructor.
+     *
+     * @param BaseService $service
+     */
+    public function __construct(BaseService $service)
+    {
+        $this->service = $service;
+        $this->boot();
+    }
+
+    /**
+     * Boot the controller
+     */
+    protected function boot()
+    {
+        // Override in child classes
+    }
+
+    /**
+     * Display a listing of the resource.
+     *
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function index(Request $request)
+    {
+        try {
+            $query = $this->buildQuery($request);
+            $perPage = $this->getPerPage($request);
+            
+            $result = $this->service->paginate($perPage);
+            
+            return $this->successResponse($result, 'Records retrieved successfully');
+
+        } catch (Exception $e) {
+            Log::error('Controller index error: ' . $e->getMessage(), [
+                'controller' => get_class($this),
+                'exception' => $e
+            ]);
+            
+            return $this->errorResponse('Failed to retrieve records', 500);
+        }
+    }
+
+    /**
+     * Store a newly created resource in storage.
+     *
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function store(Request $request)
+    {
+        try {
+            $data = $this->validateRequest($request, 'store');
+            
+            $result = $this->service->create($data);
+            
+            return $this->successResponse($result, 'Record created successfully', 201);
+
+        } catch (Exception $e) {
+            Log::error('Controller store error: ' . $e->getMessage(), [
+                'controller' => get_class($this),
+                'data' => $request->all(),
+                'exception' => $e
+            ]);
+            
+            return $this->errorResponse('Failed to create record', 500);
+        }
+    }
+
+    /**
+     * Display the specified resource.
+     *
+     * @param int $id
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function show($id, Request $request)
+    {
+        try {
+            $includes = $this->getIncludes($request);
+            
+            $result = $this->service->find($id);
+            
+            if (!$result) {
+                return $this->errorResponse('Record not found', 404);
+            }
+            
+            return $this->successResponse($result, 'Record retrieved successfully');
+
+        } catch (Exception $e) {
+            Log::error('Controller show error: ' . $e->getMessage(), [
+                'controller' => get_class($this),
+                'id' => $id,
+                'exception' => $e
+            ]);
+            
+            return $this->errorResponse('Failed to retrieve record', 500);
+        }
+    }
+
+    /**
+     * Update the specified resource in storage.
+     *
+     * @param Request $request
+     * @param int $id
+     * @return JsonResponse
+     */
+    public function update(Request $request, $id)
+    {
+        try {
+            $data = $this->validateRequest($request, 'update');
+            
+            $result = $this->service->update($id, $data);
+            
+            return $this->successResponse($result, 'Record updated successfully');
+
+        } catch (Exception $e) {
+            Log::error('Controller update error: ' . $e->getMessage(), [
+                'controller' => get_class($this),
+                'id' => $id,
+                'data' => $request->all(),
+                'exception' => $e
+            ]);
+            
+            return $this->errorResponse('Failed to update record', 500);
+        }
+    }
+
+    /**
+     * Remove the specified resource from storage.
+     *
+     * @param int $id
+     * @return JsonResponse
+     */
+    public function destroy($id)
+    {
+        try {
+            $result = $this->service->delete($id);
+            
+            if (!$result) {
+                return $this->errorResponse('Record not found', 404);
+            }
+            
+            return $this->successResponse(null, 'Record deleted successfully');
+
+        } catch (Exception $e) {
+            Log::error('Controller destroy error: ' . $e->getMessage(), [
+                'controller' => get_class($this),
+                'id' => $id,
+                'exception' => $e
+            ]);
+            
+            return $this->errorResponse('Failed to delete record', 500);
+        }
+    }
+
+    /**
+     * Search records
+     *
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function search(Request $request)
+    {
+        try {
+            $query = $request->get('q');
+            $fields = $request->get('fields', $this->searchableFields);
+            
+            if (!$query) {
+                return $this->errorResponse('Search query is required', 400);
+            }
+            
+            $result = $this->service->search($query, $fields);
+            
+            return $this->successResponse($result, 'Search completed successfully');
+
+        } catch (Exception $e) {
+            Log::error('Controller search error: ' . $e->getMessage(), [
+                'controller' => get_class($this),
+                'query' => $request->get('q'),
+                'exception' => $e
+            ]);
+            
+            return $this->errorResponse('Failed to search records', 500);
+        }
+    }
+
+    /**
+     * Bulk operations
+     *
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function bulk(Request $request)
+    {
+        try {
+            $action = $request->get('action');
+            $ids = $request->get('ids', []);
+            
+            if (empty($ids)) {
+                return $this->errorResponse('No records selected', 400);
+            }
+            
+            switch ($action) {
+                case 'delete':
+                    $result = $this->service->bulkDelete(['id' => ['IN', $ids]]);
+                    $message = 'Records deleted successfully';
+                    break;
+                    
+                case 'update':
+                    $data = $request->get('data', []);
+                    $result = $this->service->bulkUpdate(['id' => ['IN', $ids]], $data);
+                    $message = 'Records updated successfully';
+                    break;
+                    
+                default:
+                    return $this->errorResponse('Invalid action', 400);
+            }
+            
+            return $this->successResponse($result, $message);
+
+        } catch (Exception $e) {
+            Log::error('Controller bulk error: ' . $e->getMessage(), [
+                'controller' => get_class($this),
+                'action' => $request->get('action'),
+                'ids' => $request->get('ids'),
+                'exception' => $e
+            ]);
+            
+            return $this->errorResponse('Failed to perform bulk operation', 500);
+        }
+    }
+
+    /**
+     * Build query from request
+     *
+     * @param Request $request
+     * @return array
+     */
+    protected function buildQuery(Request $request)
+    {
+        $query = [];
+        
+        // Add filters
+        foreach ($this->allowedFilters as $filter) {
+            if ($request->has($filter)) {
+                $query[$filter] = $request->get($filter);
+            }
+        }
+        
+        // Add search
+        if ($request->has('search') && !empty($this->searchableFields)) {
+            $search = $request->get('search');
+            foreach ($this->searchableFields as $field) {
+                $query[$field] = ['LIKE', '%' . $search . '%'];
+            }
+        }
+        
+        return $query;
+    }
+
+    /**
+     * Get per page value
+     *
+     * @param Request $request
+     * @return int
+     */
+    protected function getPerPage(Request $request)
+    {
+        $perPage = $request->get('per_page', $this->defaultPerPage);
+        return min($perPage, $this->maxPerPage);
+    }
+
+    /**
+     * Get includes from request
+     *
+     * @param Request $request
+     * @return array
+     */
+    protected function getIncludes(Request $request)
+    {
+        $includes = $request->get('include', '');
+        
+        if (empty($includes)) {
+            return [];
+        }
+        
+        $includes = explode(',', $includes);
+        return array_intersect($includes, $this->allowedIncludes);
+    }
+
+    /**
+     * Validate request data
+     *
+     * @param Request $request
+     * @param string $action
+     * @return array
+     */
+    protected function validateRequest(Request $request, $action = 'store')
+    {
+        $rules = $this->validationRules[$action] ?? $this->validationRules;
+        
+        if (empty($rules)) {
+            return $request->all();
+        }
+        
+        $validator = Validator::make($request->all(), $rules);
+        
+        if ($validator->fails()) {
+            throw new Exception('Validation failed: ' . $validator->errors()->first());
+        }
+        
+        return $request->only(array_keys($rules));
+    }
+
+    /**
+     * Success response
+     *
+     * @param mixed $data
+     * @param string $message
+     * @param int $status
+     * @return JsonResponse
+     */
+    protected function successResponse($data, $message = 'Success', $status = 200)
+    {
+        return response()->json([
+            'success' => true,
+            'message' => $message,
+            'data' => $data
+        ], $status);
+    }
+
+    /**
+     * Error response
+     *
+     * @param string $message
+     * @param int $status
+     * @param array $errors
+     * @return JsonResponse
+     */
+    protected function errorResponse($message = 'Error', $status = 400, $errors = [])
+    {
+        $response = [
+            'success' => false,
+            'message' => $message
+        ];
+        
+        if (!empty($errors)) {
+            $response['errors'] = $errors;
+        }
+        
+        return response()->json($response, $status);
+    }
+
+    /**
+     * Set validation rules
+     *
+     * @param array $rules
+     * @return $this
+     */
+    public function setValidationRules(array $rules)
+    {
+        $this->validationRules = $rules;
+        return $this;
+    }
+
+    /**
+     * Set searchable fields
+     *
+     * @param array $fields
+     * @return $this
+     */
+    public function setSearchableFields(array $fields)
+    {
+        $this->searchableFields = $fields;
+        return $this;
+    }
+
+    /**
+     * Set allowed filters
+     *
+     * @param array $filters
+     * @return $this
+     */
+    public function setAllowedFilters(array $filters)
+    {
+        $this->allowedFilters = $filters;
+        return $this;
+    }
+
+    /**
+     * Set allowed sorts
+     *
+     * @param array $sorts
+     * @return $this
+     */
+    public function setAllowedSorts(array $sorts)
+    {
+        $this->allowedSorts = $sorts;
+        return $this;
+    }
+
+    /**
+     * Set allowed includes
+     *
+     * @param array $includes
+     * @return $this
+     */
+    public function setAllowedIncludes(array $includes)
+    {
+        $this->allowedIncludes = $includes;
+        return $this;
+    }
+
+    /**
+     * Get service instance
+     *
+     * @return BaseService
+     */
+    public function getService()
+    {
+        return $this->service;
+    }
+} 

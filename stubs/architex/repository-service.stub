@@ -1,0 +1,423 @@
+<?php
+
+namespace {{namespace}};
+
+use Illuminate\Support\Facades\App;
+use {{base_namespace}}\BaseRepository;
+use {{base_namespace}}\Contracts\RepositoryInterface;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Collection;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+
+/**
+ * Class RepositoryService
+ *
+ * @package {{namespace}}
+ */
+class RepositoryService
+{
+    /**
+     * @var BaseRepository
+     */
+    protected $repository;
+
+    /**
+     * @var string
+     */
+    protected $modelClass;
+
+    /**
+     * RepositoryService constructor.
+     *
+     * @param string $modelClass
+     */
+    public function __construct(string $modelClass)
+    {
+        $this->modelClass = $modelClass;
+        $this->repository = $this->createRepository();
+    }
+
+    /**
+     * Create repository instance
+     *
+     * @return BaseRepository
+     */
+    protected function createRepository()
+    {
+        return new class(App::make('Illuminate\Container\Container')) extends BaseRepository {
+            protected $modelClass;
+
+            public function setModelClass($modelClass)
+            {
+                $this->modelClass = $modelClass;
+                return $this;
+            }
+
+            public function model()
+            {
+                return $this->modelClass;
+            }
+        };
+    }
+
+    /**
+     * Set model class for repository
+     *
+     * @param string $modelClass
+     * @return $this
+     */
+    public function model(string $modelClass)
+    {
+        $this->modelClass = $modelClass;
+        $this->repository = $this->createRepository();
+        $this->repository->setModelClass($modelClass);
+        return $this;
+    }
+
+    /**
+     * Get all records
+     *
+     * @param array $columns
+     * @return mixed
+     */
+    public function all($columns = ['*'])
+    {
+        return $this->repository->all($columns);
+    }
+
+    /**
+     * Get first record
+     *
+     * @param array $columns
+     * @return mixed
+     */
+    public function first($columns = ['*'])
+    {
+        return $this->repository->first($columns);
+    }
+
+    /**
+     * Find record by ID
+     *
+     * @param int $id
+     * @param array $columns
+     * @return mixed
+     */
+    public function find($id, $columns = ['*'])
+    {
+        return $this->repository->find($id, $columns);
+    }
+
+    /**
+     * Find record by field
+     *
+     * @param string $field
+     * @param mixed $value
+     * @param array $columns
+     * @return mixed
+     */
+    public function findByField($field, $value = null, $columns = ['*'])
+    {
+        return $this->repository->findByField($field, $value, $columns);
+    }
+
+    /**
+     * Find records by multiple fields
+     *
+     * @param array $where
+     * @param array $columns
+     * @return mixed
+     */
+    public function findWhere(array $where, $columns = ['*'])
+    {
+        return $this->repository->findWhere($where, $columns);
+    }
+
+    /**
+     * Find records by multiple values in one field
+     *
+     * @param string $field
+     * @param array $values
+     * @param array $columns
+     * @return mixed
+     */
+    public function findWhereIn($field, array $values, $columns = ['*'])
+    {
+        return $this->repository->findWhereIn($field, $values, $columns);
+    }
+
+    /**
+     * Find records by excluding multiple values in one field
+     *
+     * @param string $field
+     * @param array $values
+     * @param array $columns
+     * @return mixed
+     */
+    public function findWhereNotIn($field, array $values, $columns = ['*'])
+    {
+        return $this->repository->findWhereNotIn($field, $values, $columns);
+    }
+
+    /**
+     * Find records by between values in one field
+     *
+     * @param string $field
+     * @param array $values
+     * @param array $columns
+     * @return mixed
+     */
+    public function findWhereBetween($field, array $values, $columns = ['*'])
+    {
+        return $this->repository->findWhereBetween($field, $values, $columns);
+    }
+
+    /**
+     * Create new record
+     *
+     * @param array $attributes
+     * @return mixed
+     */
+    public function create(array $attributes)
+    {
+        return $this->repository->create($attributes);
+    }
+
+    /**
+     * Update record by ID
+     *
+     * @param array $attributes
+     * @param int $id
+     * @return mixed
+     */
+    public function update(array $attributes, $id)
+    {
+        return $this->repository->update($attributes, $id);
+    }
+
+    /**
+     * Update or create record
+     *
+     * @param array $attributes
+     * @param array $values
+     * @return mixed
+     */
+    public function updateOrCreate(array $attributes, array $values = [])
+    {
+        return $this->repository->updateOrCreate($attributes, $values);
+    }
+
+    /**
+     * Delete record by ID
+     *
+     * @param int $id
+     * @return int
+     */
+    public function delete($id)
+    {
+        return $this->repository->delete($id);
+    }
+
+    /**
+     * Delete records by criteria
+     *
+     * @param array $where
+     * @return int
+     */
+    public function deleteWhere(array $where)
+    {
+        return $this->repository->deleteWhere($where);
+    }
+
+    /**
+     * Get paginated records
+     *
+     * @param int|null $limit
+     * @param array $columns
+     * @param string $method
+     * @return mixed
+     */
+    public function paginate($limit = null, $columns = ['*'], $method = "paginate")
+    {
+        return $this->repository->paginate($limit, $columns, $method);
+    }
+
+    /**
+     * Get simple paginated records
+     *
+     * @param int|null $limit
+     * @param array $columns
+     * @return mixed
+     */
+    public function simplePaginate($limit = null, $columns = ['*'])
+    {
+        return $this->repository->simplePaginate($limit, $columns);
+    }
+
+    /**
+     * Count records
+     *
+     * @param array $where
+     * @param string $columns
+     * @return int
+     */
+    public function count(array $where = [], $columns = '*')
+    {
+        return $this->repository->count($where, $columns);
+    }
+
+    /**
+     * Load relationships
+     *
+     * @param array|string $relations
+     * @return $this
+     */
+    public function with($relations)
+    {
+        $this->repository = $this->repository->with($relations);
+        return $this;
+    }
+
+    /**
+     * Add subselect queries to count the relations
+     *
+     * @param mixed $relations
+     * @return $this
+     */
+    public function withCount($relations)
+    {
+        $this->repository = $this->repository->withCount($relations);
+        return $this;
+    }
+
+    /**
+     * Load relation with closure
+     *
+     * @param string $relation
+     * @param \Closure $closure
+     * @return $this
+     */
+    public function whereHas($relation, $closure)
+    {
+        $this->repository = $this->repository->whereHas($relation, $closure);
+        return $this;
+    }
+
+    /**
+     * Order by column
+     *
+     * @param mixed $column
+     * @param string $direction
+     * @return $this
+     */
+    public function orderBy($column, $direction = 'asc')
+    {
+        $this->repository = $this->repository->orderBy($column, $direction);
+        return $this;
+    }
+
+    /**
+     * Limit results
+     *
+     * @param int $limit
+     * @return $this
+     */
+    public function take($limit)
+    {
+        $this->repository = $this->repository->take($limit);
+        return $this;
+    }
+
+    /**
+     * Get pluck data
+     *
+     * @param string $column
+     * @param string|null $key
+     * @return mixed
+     */
+    public function pluck($column, $key = null)
+    {
+        return $this->repository->pluck($column, $key);
+    }
+
+    /**
+     * Sync relations
+     *
+     * @param int $id
+     * @param string $relation
+     * @param array $attributes
+     * @param bool $detaching
+     * @return mixed
+     */
+    public function sync($id, $relation, $attributes, $detaching = true)
+    {
+        return $this->repository->sync($id, $relation, $attributes, $detaching);
+    }
+
+    /**
+     * Sync without detaching
+     *
+     * @param int $id
+     * @param string $relation
+     * @param array $attributes
+     * @return mixed
+     */
+    public function syncWithoutDetaching($id, $relation, $attributes)
+    {
+        return $this->repository->syncWithoutDetaching($id, $relation, $attributes);
+    }
+
+    /**
+     * First or create
+     *
+     * @param array $attributes
+     * @return mixed
+     */
+    public function firstOrCreate(array $attributes = [])
+    {
+        return $this->repository->firstOrCreate($attributes);
+    }
+
+    /**
+     * First or new
+     *
+     * @param array $attributes
+     * @return mixed
+     */
+    public function firstOrNew(array $attributes = [])
+    {
+        return $this->repository->firstOrNew($attributes);
+    }
+
+    /**
+     * Get underlying repository
+     *
+     * @return BaseRepository
+     */
+    public function getRepository()
+    {
+        return $this->repository;
+    }
+
+    /**
+     * Get model class
+     *
+     * @return string
+     */
+    public function getModelClass()
+    {
+        return $this->modelClass;
+    }
+
+    /**
+     * Magic method to call repository methods
+     *
+     * @param string $method
+     * @param array $arguments
+     * @return mixed
+     */
+    public function __call($method, $arguments)
+    {
+        return call_user_func_array([$this->repository, $method], $arguments);
+    }
+} 
