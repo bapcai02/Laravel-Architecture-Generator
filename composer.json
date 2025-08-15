@@ -3,10 +3,25 @@
     "description": "Laravel Architecture Generator - A powerful tool to generate project structure based on popular architecture patterns",
     "type": "library",
     "license": "MIT",
+    "keywords": [
+        "laravel",
+        "architecture",
+        "generator",
+        "ddd",
+        "cqrs",
+        "repository",
+        "service",
+        "command",
+        "query",
+        "event",
+        "artisan",
+        "scaffolding"
+    ],
+    "homepage": "https://github.com/laravel-architex/architecture-generator",
     "authors": [
         {
-            "name": "Laravel Architex Team",
-            "email": "team@laravel-architex.com"
+            "name": "Laravel Architex",
+            "email": "hadv62@wru.vn"
         }
     ],
     "require": {
@@ -20,6 +35,10 @@
         "phpunit/phpunit": "^9.0",
         "orchestra/testbench": "^6.0|^7.0|^8.0"
     },
+    "suggest": {
+        "laravel/ide-helper": "For better IDE support with generated classes",
+        "barryvdh/laravel-debugbar": "For debugging generated architecture components"
+    },
     "autoload": {
         "psr-4": {
             "LaravelArchitex\\": "src/"
@@ -29,6 +48,12 @@
         "psr-4": {
             "LaravelArchitex\\Tests\\": "tests/"
         }
+    },
+    "scripts": {
+        "test": "phpunit",
+        "test-coverage": "phpunit --coverage-html coverage",
+        "check-style": "phpcs src tests",
+        "fix-style": "phpcbf src tests"
     },
     "extra": {
         "laravel": {
@@ -41,5 +66,14 @@
         "sort-packages": true
     },
     "minimum-stability": "stable",
-    "prefer-stable": true
+    "prefer-stable": true,
+    "support": {
+        "issues": "https://github.com/laravel-architex/architecture-generator/issues",
+        "source": "https://github.com/laravel-architex/architecture-generator",
+        "docs": "https://github.com/laravel-architex/architecture-generator/blob/main/README.md"
+    },
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/laravel-architex/architecture-generator.git"
+    }
 } 
