@@ -1,0 +1,68 @@
+<?php
+
+namespace {{namespace}};
+
+use {{base_namespace}}\BaseRepository;
+use {{interface_namespace}};
+
+/**
+ * Class {{class_name}}
+ *
+ * @package {{namespace}}
+ */
+class {{class_name}} extends BaseRepository implements {{interface_name}}
+{
+    /**
+     * Specify Model class name
+     *
+     * @return string
+     */
+    public function model()
+    {
+        return \{{model_namespace}}\{{model_name}}::class;
+    }
+
+    /**
+     * Boot the repository
+     */
+    public function boot()
+    {
+        // Add any custom initialization logic here
+    }
+
+    /**
+     * Get searchable fields
+     *
+     * @return array
+     */
+    public function getFieldsSearchable()
+    {
+        return [
+            'name',
+            'email',
+            // Add more searchable fields as needed
+        ];
+    }
+
+    /**
+     * Custom method example
+     *
+     * @param string $email
+     * @return mixed
+     */
+    public function findByEmail($email)
+    {
+        return $this->findByField('email', $email);
+    }
+
+    /**
+     * Custom method example with criteria
+     *
+     * @param array $criteria
+     * @return mixed
+     */
+    public function findByCriteria(array $criteria)
+    {
+        return $this->findWhere($criteria);
+    }
+} 

@@ -1,0 +1,60 @@
+<?php
+
+namespace {{namespace}};
+
+use Illuminate\Support\Facades\Facade;
+
+/**
+ * Class Repository
+ *
+ * @package {{namespace}}
+ * @method static mixed all($columns = ['*'])
+ * @method static mixed first($columns = ['*'])
+ * @method static mixed find($id, $columns = ['*'])
+ * @method static mixed findByField($field, $value = null, $columns = ['*'])
+ * @method static mixed findWhere(array $where, $columns = ['*'])
+ * @method static mixed findWhereIn($field, array $values, $columns = ['*'])
+ * @method static mixed findWhereNotIn($field, array $values, $columns = ['*'])
+ * @method static mixed findWhereBetween($field, array $values, $columns = ['*'])
+ * @method static mixed create(array $attributes)
+ * @method static mixed update(array $attributes, $id)
+ * @method static mixed updateOrCreate(array $attributes, array $values = [])
+ * @method static int delete($id)
+ * @method static int deleteWhere(array $where)
+ * @method static mixed paginate($limit = null, $columns = ['*'], $method = "paginate")
+ * @method static mixed simplePaginate($limit = null, $columns = ['*'])
+ * @method static int count(array $where = [], $columns = '*')
+ * @method static $this with($relations)
+ * @method static $this withCount($relations)
+ * @method static $this whereHas($relation, $closure)
+ * @method static $this orderBy($column, $direction = 'asc')
+ * @method static $this take($limit)
+ * @method static mixed pluck($column, $key = null)
+ * @method static mixed sync($id, $relation, $attributes, $detaching = true)
+ * @method static mixed syncWithoutDetaching($id, $relation, $attributes)
+ * @method static mixed firstOrCreate(array $attributes = [])
+ * @method static mixed firstOrNew(array $attributes = [])
+ */
+class Repository extends Facade
+{
+    /**
+     * Get the registered name of the component.
+     *
+     * @return string
+     */
+    protected static function getFacadeAccessor()
+    {
+        return 'repository';
+    }
+
+    /**
+     * Set model class for repository
+     *
+     * @param string $modelClass
+     * @return RepositoryService
+     */
+    public static function model($modelClass)
+    {
+        return app('repository')->model($modelClass);
+    }
+} 

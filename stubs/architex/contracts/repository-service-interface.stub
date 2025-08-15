@@ -1,0 +1,262 @@
+<?php
+
+namespace {{namespace}}\Contracts;
+
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Collection;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+
+/**
+ * Interface RepositoryServiceInterface
+ *
+ * @package {{namespace}}\Contracts
+ */
+interface RepositoryServiceInterface
+{
+    /**
+     * Set model class for repository
+     *
+     * @param string $modelClass
+     * @return $this
+     */
+    public function model(string $modelClass);
+
+    /**
+     * Get all records
+     *
+     * @param array $columns
+     * @return mixed
+     */
+    public function all($columns = ['*']);
+
+    /**
+     * Get first record
+     *
+     * @param array $columns
+     * @return mixed
+     */
+    public function first($columns = ['*']);
+
+    /**
+     * Find record by ID
+     *
+     * @param int $id
+     * @param array $columns
+     * @return mixed
+     */
+    public function find($id, $columns = ['*']);
+
+    /**
+     * Find record by field
+     *
+     * @param string $field
+     * @param mixed $value
+     * @param array $columns
+     * @return mixed
+     */
+    public function findByField($field, $value = null, $columns = ['*']);
+
+    /**
+     * Find records by multiple fields
+     *
+     * @param array $where
+     * @param array $columns
+     * @return mixed
+     */
+    public function findWhere(array $where, $columns = ['*']);
+
+    /**
+     * Find records by multiple values in one field
+     *
+     * @param string $field
+     * @param array $values
+     * @param array $columns
+     * @return mixed
+     */
+    public function findWhereIn($field, array $values, $columns = ['*']);
+
+    /**
+     * Find records by excluding multiple values in one field
+     *
+     * @param string $field
+     * @param array $values
+     * @param array $columns
+     * @return mixed
+     */
+    public function findWhereNotIn($field, array $values, $columns = ['*']);
+
+    /**
+     * Find records by between values in one field
+     *
+     * @param string $field
+     * @param array $values
+     * @param array $columns
+     * @return mixed
+     */
+    public function findWhereBetween($field, array $values, $columns = ['*']);
+
+    /**
+     * Create new record
+     *
+     * @param array $attributes
+     * @return mixed
+     */
+    public function create(array $attributes);
+
+    /**
+     * Update record by ID
+     *
+     * @param array $attributes
+     * @param int $id
+     * @return mixed
+     */
+    public function update(array $attributes, $id);
+
+    /**
+     * Update or create record
+     *
+     * @param array $attributes
+     * @param array $values
+     * @return mixed
+     */
+    public function updateOrCreate(array $attributes, array $values = []);
+
+    /**
+     * Delete record by ID
+     *
+     * @param int $id
+     * @return int
+     */
+    public function delete($id);
+
+    /**
+     * Delete records by criteria
+     *
+     * @param array $where
+     * @return int
+     */
+    public function deleteWhere(array $where);
+
+    /**
+     * Get paginated records
+     *
+     * @param int|null $limit
+     * @param array $columns
+     * @param string $method
+     * @return mixed
+     */
+    public function paginate($limit = null, $columns = ['*'], $method = "paginate");
+
+    /**
+     * Get simple paginated records
+     *
+     * @param int|null $limit
+     * @param array $columns
+     * @return mixed
+     */
+    public function simplePaginate($limit = null, $columns = ['*']);
+
+    /**
+     * Count records
+     *
+     * @param array $where
+     * @param string $columns
+     * @return int
+     */
+    public function count(array $where = [], $columns = '*');
+
+    /**
+     * Load relationships
+     *
+     * @param array|string $relations
+     * @return $this
+     */
+    public function with($relations);
+
+    /**
+     * Add subselect queries to count the relations
+     *
+     * @param mixed $relations
+     * @return $this
+     */
+    public function withCount($relations);
+
+    /**
+     * Load relation with closure
+     *
+     * @param string $relation
+     * @param \Closure $closure
+     * @return $this
+     */
+    public function whereHas($relation, $closure);
+
+    /**
+     * Order by column
+     *
+     * @param mixed $column
+     * @param string $direction
+     * @return $this
+     */
+    public function orderBy($column, $direction = 'asc');
+
+    /**
+     * Limit results
+     *
+     * @param int $limit
+     * @return $this
+     */
+    public function take($limit);
+
+    /**
+     * Get pluck data
+     *
+     * @param string $column
+     * @param string|null $key
+     * @return mixed
+     */
+    public function pluck($column, $key = null);
+
+    /**
+     * Sync relations
+     *
+     * @param int $id
+     * @param string $relation
+     * @param array $attributes
+     * @param bool $detaching
+     * @return mixed
+     */
+    public function sync($id, $relation, $attributes, $detaching = true);
+
+    /**
+     * Sync without detaching
+     *
+     * @param int $id
+     * @param string $relation
+     * @param array $attributes
+     * @return mixed
+     */
+    public function syncWithoutDetaching($id, $relation, $attributes);
+
+    /**
+     * First or create
+     *
+     * @param array $attributes
+     * @return mixed
+     */
+    public function firstOrCreate(array $attributes = []);
+
+    /**
+     * First or new
+     *
+     * @param array $attributes
+     * @return mixed
+     */
+    public function firstOrNew(array $attributes = []);
+
+    /**
+     * Get model class
+     *
+     * @return string
+     */
+    public function getModelClass();
+} 

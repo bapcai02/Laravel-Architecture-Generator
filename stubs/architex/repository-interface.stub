@@ -1,0 +1,29 @@
+<?php
+
+namespace {{namespace}};
+
+use {{base_namespace}}\Contracts\RepositoryInterface;
+
+/**
+ * Interface {{class_name}}
+ *
+ * @package {{namespace}}
+ */
+interface {{class_name}} extends RepositoryInterface
+{
+    /**
+     * Custom method example
+     *
+     * @param string $email
+     * @return mixed
+     */
+    public function findByEmail($email);
+
+    /**
+     * Custom method example with criteria
+     *
+     * @param array $criteria
+     * @return mixed
+     */
+    public function findByCriteria(array $criteria);
+} 

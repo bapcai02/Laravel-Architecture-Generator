@@ -37,6 +37,19 @@ class ArchitectureGenerator
         
         $createdFiles = [];
         
+        // Create BaseRepository if it doesn't exist
+        $baseNamespace = $config['base_namespace'] ?? $config['namespace'] . '\\Base';
+        $basePath = $config['path'] . '/Base/BaseRepository.php';
+        
+        if (!$this->filesystem->exists($basePath)) {
+            $baseContent = $this->templateEngine->render('base-repository.stub', [
+                'namespace' => $baseNamespace,
+                'base_namespace' => $baseNamespace,
+            ]);
+            $this->createFile($basePath, $baseContent);
+            $createdFiles[] = $basePath;
+        }
+        
         // Create interface
         $interfaceContent = $this->templateEngine->render('repository-interface.stub', [
             'namespace' => $interfaceNamespace,
@@ -56,6 +69,7 @@ class ArchitectureGenerator
             'interface_namespace' => $interfaceNamespace,
             'model_name' => $name,
             'model_namespace' => 'App\\Models',
+            'base_namespace' => $baseNamespace,
         ]);
         
         $this->createFile($implementationPath, $implementationContent);
