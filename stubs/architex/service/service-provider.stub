@@ -1,0 +1,34 @@
+<?php
+
+namespace {{namespace}};
+
+use Illuminate\Support\ServiceProvider;
+
+/**
+ * Service Provider for all Services
+ *
+ * @package {{namespace}}
+ * @author {{author}}
+ * @since {{year}}
+ */
+class ServiceServiceProvider extends ServiceProvider
+{
+    /**
+     * Register services.
+     */
+    public function register(): void
+    {
+        // Service bindings
+        $this->app->bind(\App\Services\Interfaces\{{class_name}}ServiceInterface::class, \App\Services\Implementations\{{class_name}}Service::class);
+        
+        // Add more service bindings here as needed
+    }
+
+    /**
+     * Bootstrap services.
+     */
+    public function boot(): void
+    {
+        // Boot logic here if needed
+    }
+} 

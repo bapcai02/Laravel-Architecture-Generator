@@ -1,0 +1,96 @@
+<?php
+
+namespace {{base_namespace}}\Contracts;
+
+/**
+ * Interface RepositoryInterface
+ *
+ * @package {{base_namespace}}\Contracts
+ * @author {{author}}
+ * @since {{year}}
+ */
+interface RepositoryInterface
+{
+    /**
+     * Get all records with optional filters
+     *
+     * @param array $filters
+     * @return array
+     */
+    public function getAll(array $filters = []): array;
+
+    /**
+     * Find record by ID
+     *
+     * @param int $id
+     * @return object|null
+     */
+    public function findById(int $id): ?object;
+
+    /**
+     * Create new record
+     *
+     * @param array $data
+     * @return object
+     */
+    public function create(array $data): object;
+
+    /**
+     * Update record
+     *
+     * @param int $id
+     * @param array $data
+     * @return object|null
+     */
+    public function update(int $id, array $data): ?object;
+
+    /**
+     * Delete record
+     *
+     * @param int $id
+     * @return bool
+     */
+    public function delete(int $id): bool;
+
+    /**
+     * Check if record exists
+     *
+     * @param int $id
+     * @return bool
+     */
+    public function exists(int $id): bool;
+
+    /**
+     * Count records with optional filters
+     *
+     * @param array $filters
+     * @return int
+     */
+    public function count(array $filters = []): int;
+
+    /**
+     * Find record by specific field
+     *
+     * @param string $field
+     * @param mixed $value
+     * @return object|null
+     */
+    public function findBy(string $field, $value): ?object;
+
+    /**
+     * Find records by criteria
+     *
+     * @param array $criteria
+     * @return array
+     */
+    public function findByCriteria(array $criteria): array;
+
+    /**
+     * Paginate records
+     *
+     * @param int $perPage
+     * @param array $filters
+     * @return array
+     */
+    public function paginate(int $perPage = 15, array $filters = []): array;
+} 

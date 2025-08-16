@@ -1,0 +1,62 @@
+<?php
+
+namespace {{namespace}}\Infrastructure\Providers;
+
+use Illuminate\Support\ServiceProvider;
+use {{namespace}}\Domain\Repositories\{{class_name}}RepositoryInterface;
+use {{namespace}}\Infrastructure\Repositories\Eloquent{{class_name}}Repository;
+use {{namespace}}\Application\Handlers\{{class_name}}CommandHandler;
+use {{namespace}}\Application\Handlers\{{class_name}}QueryHandler;
+use {{namespace}}\Domain\Services\{{class_name}}DomainService;
+
+/**
+ * {{class_name}} Service Provider
+ *
+ * @package {{namespace}}\Infrastructure\Providers
+ * @author {{author}}
+ * @since {{year}}
+ */
+class {{class_name}}ServiceProvider extends ServiceProvider
+{
+    /**
+     * Register services.
+     */
+    public function register(): void
+    {
+        // Register repository
+        $this->app->bind({{class_name}}RepositoryInterface::class, Eloquent{{class_name}}Repository::class);
+        
+        // Register domain service
+        $this->app->bind({{class_name}}DomainService::class, function ($app) {
+            return new {{class_name}}DomainService(
+                $app->make({{class_name}}RepositoryInterface::class)
+            );
+        });
+        
+        // Register command handler
+        $this->app->bind({{class_name}}CommandHandler::class, function ($app) {
+            return new {{class_name}}CommandHandler(
+                $app->make({{class_name}}DomainService::class)
+            );
+        });
+        
+        // Register query handler
+        $this->app->bind({{class_name}}QueryHandler::class, function ($app) {
+            return new {{class_name}}QueryHandler(
+                $app->make({{class_name}}DomainService::class)
+            );
+        });
+    }
+
+    /**
+     * Bootstrap services.
+     */
+    public function boot(): void
+    {
+        // Load routes
+        $this->loadRoutesFrom(__DIR__ . '/../../UI/routes/api-routes.php');
+        
+        // Load migrations
+        $this->loadMigrationsFrom(__DIR__ . '/../database/migrations');
+    }
+} 

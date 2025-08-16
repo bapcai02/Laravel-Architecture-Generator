@@ -1,0 +1,112 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use Illuminate\Http\Request;
+use {{repository_interface_namespace}}\{{repository_interface_name}};
+use App\Http\Requests\Store{{class_name}}Request;
+use App\Http\Requests\Update{{class_name}}Request;
+
+class {{class_name}}Controller extends Controller
+{
+    protected ${{class_name_lower}}Repository;
+
+    public function __construct({{repository_interface_name}} ${{class_name_lower}}Repository)
+    {
+        $this->{{class_name_lower}}Repository = ${{class_name_lower}}Repository;
+    }
+
+    /**
+     * Display a listing of {{class_name_lower}}s
+     */
+    public function index(Request $request)
+    {
+        $filters = $request->all();
+        ${{class_name_lower}}s = $this->{{class_name_lower}}Repository->getAll($filters);
+        
+        return response()->json([
+            'success' => true,
+            'data' => ${{class_name_lower}}s,
+            'count' => $this->{{class_name_lower}}Repository->count($filters)
+        ]);
+    }
+
+    /**
+     * Store a newly created {{class_name_lower}}
+     */
+    public function store(Store{{class_name}}Request $request)
+    {
+        $data = $request->validated();
+
+        ${{class_name_lower}} = $this->{{class_name_lower}}Repository->create($data);
+        
+        return response()->json([
+            'success' => true,
+            'data' => ${{class_name_lower}},
+            'message' => '{{class_name}} created successfully'
+        ], 201);
+    }
+
+    /**
+     * Display the specified {{class_name_lower}}
+     */
+    public function show(int $id)
+    {
+        ${{class_name_lower}} = $this->{{class_name_lower}}Repository->findById($id);
+        
+        if (!${{class_name_lower}}) {
+            return response()->json([
+                'success' => false,
+                'message' => '{{class_name}} not found'
+            ], 404);
+        }
+        
+        return response()->json([
+            'success' => true,
+            'data' => ${{class_name_lower}}
+        ]);
+    }
+
+    /**
+     * Update the specified {{class_name_lower}}
+     */
+    public function update(Update{{class_name}}Request $request, int $id)
+    {
+        $data = $request->validated();
+
+        ${{class_name_lower}} = $this->{{class_name_lower}}Repository->update($id, $data);
+        
+        if (!${{class_name_lower}}) {
+            return response()->json([
+                'success' => false,
+                'message' => '{{class_name}} not found'
+            ], 404);
+        }
+        
+        return response()->json([
+            'success' => true,
+            'data' => ${{class_name_lower}},
+            'message' => '{{class_name}} updated successfully'
+        ]);
+    }
+
+    /**
+     * Remove the specified {{class_name_lower}}
+     */
+    public function destroy(int $id)
+    {
+        $deleted = $this->{{class_name_lower}}Repository->delete($id);
+        
+        if (!$deleted) {
+            return response()->json([
+                'success' => false,
+                'message' => '{{class_name}} not found or cannot be deleted'
+            ], 404);
+        }
+        
+        return response()->json([
+            'success' => true,
+            'message' => '{{class_name}} deleted successfully'
+        ]);
+    }
+} 

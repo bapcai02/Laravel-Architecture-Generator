@@ -1,0 +1,18 @@
+<?php
+
+namespace {{namespace}}\Application\Exceptions;
+
+/**
+ * {{class_name}} Application Exception
+ *
+ * @package {{namespace}}\Application\Exceptions
+ * @author {{author}}
+ * @since {{year}}
+ */
+class {{class_name}}ApplicationException extends \Exception
+{
+    public function __construct(string $message = '', int $code = 0, \Throwable $previous = null)
+    {
+        parent::__construct($message, $code, $previous);
+    }
+} 

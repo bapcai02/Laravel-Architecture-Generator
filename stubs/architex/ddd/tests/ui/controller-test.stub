@@ -1,0 +1,155 @@
+<?php
+
+namespace {{namespace}}\Tests\UI;
+
+use PHPUnit\Framework\TestCase;
+use {{namespace}}\UI\Controllers\{{class_name}}Controller;
+use {{namespace}}\Application\Handlers\{{class_name}}CommandHandler;
+use {{namespace}}\Application\Handlers\{{class_name}}QueryHandler;
+use {{namespace}}\Application\DTOs\{{class_name}}DTO;
+use Illuminate\Http\Request;
+use Illuminate\Http\JsonResponse;
+
+/**
+ * {{class_name}} Controller Test
+ *
+ * @package {{namespace}}\Tests\UI
+ * @author {{author}}
+ * @since {{year}}
+ */
+class {{class_name}}ControllerTest extends TestCase
+{
+    private {{class_name}}Controller $controller;
+    private {{class_name}}CommandHandler $commandHandler;
+    private {{class_name}}QueryHandler $queryHandler;
+
+    protected function setUp(): void
+    {
+        $this->commandHandler = $this->createMock({{class_name}}CommandHandler::class);
+        $this->queryHandler = $this->createMock({{class_name}}QueryHandler::class);
+        
+        $this->controller = new {{class_name}}Controller(
+            $this->commandHandler,
+            $this->queryHandler
+        );
+    }
+
+    public function test_index_returns_json_response(): void
+    {
+        $request = new Request();
+        $expectedDtos = [
+            new {{class_name}}DTO('1', 'Test 1', 'Desc 1', '2023-01-01 00:00:00', '2023-01-01 00:00:00'),
+            new {{class_name}}DTO('2', 'Test 2', 'Desc 2', '2023-01-01 00:00:00', '2023-01-01 00:00:00'),
+        ];
+
+        $this->queryHandler
+            ->expects($this->once())
+            ->method('handleGetAll')
+            ->willReturn($expectedDtos);
+
+        $response = $this->controller->index($request);
+
+        $this->assertInstanceOf(JsonResponse::class, $response);
+        $this->assertEquals(200, $response->getStatusCode());
+        
+        $data = json_decode($response->getContent(), true);
+        $this->assertEquals('{{class_name}}s retrieved successfully', $data['message']);
+    }
+
+    public function test_store_creates_{{class_name_lower}}(): void
+    {
+        $request = new Request();
+        $request->merge([
+            'name' => 'Test {{class_name}}',
+            'description' => 'Test Description'
+        ]);
+
+        $this->commandHandler
+            ->expects($this->once())
+            ->method('handleCreate');
+
+        $response = $this->controller->store($request);
+
+        $this->assertInstanceOf(JsonResponse::class, $response);
+        $this->assertEquals(201, $response->getStatusCode());
+        
+        $data = json_decode($response->getContent(), true);
+        $this->assertEquals('{{class_name}} created successfully', $data['message']);
+    }
+
+    public function test_show_returns_{{class_name_lower}}_when_found(): void
+    {
+        $expectedDto = new {{class_name}}DTO(
+            'test-id',
+            'Test {{class_name}}',
+            'Test Description',
+            '2023-01-01 00:00:00',
+            '2023-01-01 00:00:00'
+        );
+
+        $this->queryHandler
+            ->expects($this->once())
+            ->method('handleGetById')
+            ->willReturn($expectedDto);
+
+        $response = $this->controller->show('test-id');
+
+        $this->assertInstanceOf(JsonResponse::class, $response);
+        $this->assertEquals(200, $response->getStatusCode());
+        
+        $data = json_decode($response->getContent(), true);
+        $this->assertEquals('{{class_name}} retrieved successfully', $data['message']);
+    }
+
+    public function test_show_returns_404_when_not_found(): void
+    {
+        $this->queryHandler
+            ->expects($this->once())
+            ->method('handleGetById')
+            ->willReturn(null);
+
+        $response = $this->controller->show('non-existent-id');
+
+        $this->assertInstanceOf(JsonResponse::class, $response);
+        $this->assertEquals(404, $response->getStatusCode());
+        
+        $data = json_decode($response->getContent(), true);
+        $this->assertEquals('{{class_name}} not found', $data['message']);
+    }
+
+    public function test_update_{{class_name_lower}}(): void
+    {
+        $request = new Request();
+        $request->merge([
+            'name' => 'Updated {{class_name}}',
+            'description' => 'Updated Description'
+        ]);
+
+        $this->commandHandler
+            ->expects($this->once())
+            ->method('handleUpdate');
+
+        $response = $this->controller->update($request, 'test-id');
+
+        $this->assertInstanceOf(JsonResponse::class, $response);
+        $this->assertEquals(200, $response->getStatusCode());
+        
+        $data = json_decode($response->getContent(), true);
+        $this->assertEquals('{{class_name}} updated successfully', $data['message']);
+    }
+
+    public function test_destroy_{{class_name_lower}}(): void
+    {
+        $this->commandHandler
+            ->expects($this->once())
+            ->method('handleDelete');
+
+        $response = $this->controller->destroy('test-id');
+
+        $this->assertInstanceOf(JsonResponse::class, $response);
+        $this->assertEquals(200, $response->getStatusCode());
+        
+        $data = json_decode($response->getContent(), true);
+        $this->assertEquals('{{class_name}} deleted successfully', $data['message']);
+    }
+} 

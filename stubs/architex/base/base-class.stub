@@ -1,0 +1,64 @@
+<?php
+
+namespace {{namespace}};
+
+{{#if use_strict}}
+declare(strict_types=1);
+{{/if}}
+
+{{#if imports}}
+{{#each imports}}
+use {{this}};
+{{/each}}
+{{/if}}
+
+/**
+ * {{class_name}}
+ *
+ * @package {{namespace}}
+ * @author {{author}}
+ * @since {{year}}
+ */
+{{#if abstract}}abstract {{/if}}class {{class_name}}{{#if extends}} extends {{extends}}{{/if}}{{#if implements}} implements {{implements}}{{/if}}
+{
+    {{#if properties}}
+    {{#each properties}}
+    {{#if visibility}}{{visibility}} {{/if}}{{#if static}}static {{/if}}{{#if type}}{{type}} {{/if}}${{name}}{{#if default}} = {{default}}{{/if}};
+    {{/each}}
+    {{/if}}
+
+    {{#if constructor}}
+    /**
+     * Constructor
+     */
+    public function __construct({{#each constructor_params}}{{#if @index}}, {{/if}}{{type}} ${{name}}{{#if default}} = {{default}}{{/if}}{{/each}})
+    {
+        {{#each constructor_body}}
+        {{this}}
+        {{/each}}
+    }
+    {{/if}}
+
+    {{#if methods}}
+    {{#each methods}}
+    /**
+     * {{description}}
+     {{#each params}}
+     * @param {{type}} ${{name}} {{description}}
+     {{/each}}
+     {{#if return_type}}
+     * @return {{return_type}}
+     {{/if}}
+     */
+    {{#if visibility}}{{visibility}} {{/if}}{{#if static}}static {{/if}}{{#if abstract}}abstract {{/if}}{{#if final}}final {{/if}}function {{name}}({{#each params}}{{#if @index}}, {{/if}}{{#if type}}{{type}} {{/if}}${{name}}{{#if default}} = {{default}}{{/if}}{{/each}}){{#if return_type}}: {{return_type}}{{/if}}
+    {
+        {{#if abstract}}{{else}}
+        {{#each body}}
+        {{this}}
+        {{/each}}
+        {{/if}}
+    }
+
+    {{/each}}
+    {{/if}}
+} 

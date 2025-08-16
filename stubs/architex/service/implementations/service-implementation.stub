@@ -1,0 +1,124 @@
+<?php
+
+namespace {{namespace}};
+
+use App\Services\Interfaces\{{class_name}}ServiceInterface;
+use {{repository_interface_namespace}}\{{class_name}}RepositoryInterface;
+
+/**
+ * {{class_name}} Service Implementation
+ *
+ * @package {{namespace}}
+ * @author {{author}}
+ * @since {{year}}
+ */
+class {{class_name}}Service implements {{class_name}}ServiceInterface
+{
+    /**
+     * @var {{class_name}}RepositoryInterface
+     */
+    private {{class_name}}RepositoryInterface $repository;
+
+    public function __construct({{class_name}}RepositoryInterface $repository)
+    {
+        $this->repository = $repository;
+    }
+
+    /**
+     * Get all {{class_name_lower}}s
+     */
+    public function getAll(array $filters = []): array
+    {
+        return $this->repository->getAll($filters);
+    }
+
+    /**
+     * Find {{class_name_lower}} by ID
+     */
+    public function findById(int $id): ?object
+    {
+        return $this->repository->findById($id);
+    }
+
+    /**
+     * Create new {{class_name_lower}}
+     */
+    public function create(array $data): object
+    {
+        // Add business logic validation here
+        $this->validateCreateData($data);
+        
+        return $this->repository->create($data);
+    }
+
+    /**
+     * Update {{class_name_lower}}
+     */
+    public function update(int $id, array $data): ?object
+    {
+        // Add business logic validation here
+        $this->validateUpdateData($data);
+        
+        return $this->repository->update($id, $data);
+    }
+
+    /**
+     * Delete {{class_name_lower}}
+     */
+    public function delete(int $id): bool
+    {
+        // Add business logic validation here
+        if (!$this->canDelete($id)) {
+            throw new \Exception('Cannot delete this {{class_name_lower}}');
+        }
+        
+        return $this->repository->delete($id);
+    }
+
+    /**
+     * Check if {{class_name_lower}} exists
+     */
+    public function exists(int $id): bool
+    {
+        return $this->repository->exists($id);
+    }
+
+    /**
+     * Count {{class_name_lower}}s
+     */
+    public function count(array $filters = []): int
+    {
+        return $this->repository->count($filters);
+    }
+
+    /**
+     * Validate create data
+     */
+    private function validateCreateData(array $data): void
+    {
+        // Add your validation logic here
+        if (empty($data['name'])) {
+            throw new \InvalidArgumentException('Name is required');
+        }
+    }
+
+    /**
+     * Validate update data
+     */
+    private function validateUpdateData(array $data): void
+    {
+        // Add your validation logic here
+        if (isset($data['name']) && empty($data['name'])) {
+            throw new \InvalidArgumentException('Name cannot be empty');
+        }
+    }
+
+    /**
+     * Check if can delete
+     */
+    private function canDelete(int $id): bool
+    {
+        // Add your business logic here
+        return true;
+    }
+} 

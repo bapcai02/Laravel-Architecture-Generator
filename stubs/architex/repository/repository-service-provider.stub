@@ -3,68 +3,32 @@
 namespace {{namespace}};
 
 use Illuminate\Support\ServiceProvider;
-use {{base_namespace}}\RepositoryService;
-use {{base_namespace}}\Repository;
 
 /**
- * Class RepositoryServiceProvider
+ * Repository Service Provider
  *
  * @package {{namespace}}
+ * @author {{author}}
+ * @since {{year}}
  */
 class RepositoryServiceProvider extends ServiceProvider
 {
     /**
-     * Register services.
-     *
-     * @return void
+     * Register repositories.
      */
-    public function register()
+    public function register(): void
     {
-        // Register RepositoryService as singleton
-        $this->app->singleton('repository', function ($app) {
-            return new RepositoryService();
-        });
-
-        // Register Repository Facade
-        $this->app->singleton('repository.facade', function ($app) {
-            return new Repository();
-        });
-
-        // Bind RepositoryService to interface
-        $this->app->bind(RepositoryService::class, function ($app) {
-            return $app->make('repository');
-        });
+        // Repository bindings
+        $this->app->bind(\App\Repositories\Interfaces\{{class_name}}RepositoryInterface::class, \App\Repositories\{{class_name}}Repository::class);
+        
+        // Add more repository bindings here as needed
     }
 
     /**
-     * Bootstrap services.
-     *
-     * @return void
+     * Bootstrap repositories.
      */
-    public function boot()
+    public function boot(): void
     {
-        // Publish configuration
-        $this->publishes([
-            __DIR__ . '/../config/repository.php' => config_path('repository.php'),
-        ], 'repository-config');
-
-        // Publish stubs
-        $this->publishes([
-            __DIR__ . '/../stubs' => base_path('stubs/architex'),
-        ], 'repository-stubs');
-    }
-
-    /**
-     * Get the services provided by the provider.
-     *
-     * @return array
-     */
-    public function provides()
-    {
-        return [
-            'repository',
-            'repository.facade',
-            RepositoryService::class,
-        ];
+        // Boot logic here if needed
     }
 } 

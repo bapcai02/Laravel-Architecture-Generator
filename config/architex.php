@@ -56,6 +56,7 @@ return [
             'enabled' => true,
             'path' => 'app/Repositories',
             'namespace' => 'App\\Repositories',
+            'base_namespace' => 'App\\Repositories\\Base',
             'interface_suffix' => 'RepositoryInterface',
             'implementation_suffix' => 'Repository',
         ],
@@ -63,7 +64,9 @@ return [
             'enabled' => true,
             'path' => 'app/Services',
             'namespace' => 'App\\Services',
-            'suffix' => 'Service',
+            'base_namespace' => 'App\\Services\\Base',
+            'interface_suffix' => 'ServiceInterface',
+            'implementation_suffix' => 'Service',
         ],
         'cqrs' => [
             'enabled' => true,
@@ -163,6 +166,7 @@ return [
             'repository' => 'Repository',
             'repository_interface' => 'RepositoryInterface',
             'service' => 'Service',
+            'service_interface' => 'ServiceInterface',
             'command' => 'Command',
             'query' => 'Query',
             'handler' => 'Handler',
@@ -183,7 +187,7 @@ return [
     |
     */
     'templates' => [
-        'stub_path' => base_path('stubs/architex'),
+        'stub_path' => base_path('stubs/architex/architex'),
         'default_stub_path' => __DIR__ . '/../stubs',
         'variables' => [
             'app_namespace' => 'App',
