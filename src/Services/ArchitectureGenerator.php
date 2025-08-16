@@ -8,13 +8,13 @@ use Illuminate\Support\Str;
 class ArchitectureGenerator
 {
     protected Filesystem $filesystem;
-    protected TemplateManager $templateManager;
+    protected SimpleTemplateEngine $templateEngine;
     protected array $config;
 
-    public function __construct(Filesystem $filesystem, TemplateManager $templateManager)
+    public function __construct(Filesystem $filesystem, SimpleTemplateEngine $templateEngine)
     {
         $this->filesystem = $filesystem;
-        $this->templateManager = $templateManager;
+        $this->templateEngine = $templateEngine;
         $this->config = config('architex', []);
     }
 
@@ -41,30 +41,24 @@ class ArchitectureGenerator
         $baseNamespace = $config['base_namespace'] ?? $config['namespace'] . '\\Base';
         $basePath = $config['path'] . '/Base/BaseRepository.php';
         
+        // Create BaseRepository
         if (!$this->filesystem->exists($basePath)) {
-            $baseContent = $this->templateManager->render('repository/base/base-repository.stub', [
-                'namespace' => $baseNamespace,
+            $baseContent = $this->templateEngine->render('repository/base/base-repository.stub', [
                 'base_namespace' => $baseNamespace,
+                'author' => 'Laravel Architex',
+                'year' => '2025',
             ]);
             $this->createFile($basePath, $baseContent);
             $createdFiles[] = $basePath;
         }
         
-        // Create BaseController if it doesn't exist
-        $baseControllerPath = $config['path'] . '/Base/BaseController.php';
-        
-        if (!$this->filesystem->exists($baseControllerPath)) {
-            $baseControllerContent = $this->templateManager->render('repository/base/base-controller.stub', [
-                'namespace' => $baseNamespace,
-            ]);
-            $this->createFile($baseControllerPath, $baseControllerContent);
-            $createdFiles[] = $baseControllerPath;
-        }
+
         
         // Create interface
-        $interfaceContent = $this->templateManager->render('repository/interfaces/repository-interface.stub', [
+        $interfaceContent = $this->templateEngine->render('repository/interfaces/repository-interface.stub', [
             'namespace' => $interfaceNamespace,
-            'class_name' => $interfaceName,
+            'class_name' => $name,
+            'class_name_lower' => strtolower($name),
             'base_namespace' => $baseNamespace,
             'model_name' => $name,
             'model_namespace' => 'App\\Models',
@@ -74,14 +68,17 @@ class ArchitectureGenerator
         $createdFiles[] = $interfacePath;
         
         // Create implementation
-        $implementationContent = $this->templateManager->render('repository/implementations/repository-implementation.stub', [
+        $implementationContent = $this->templateEngine->render('repository/implementations/repository-implementation.stub', [
             'namespace' => $implementationNamespace,
             'class_name' => $implementationName,
+            'class_name_lower' => strtolower($name),
             'interface_name' => $interfaceName,
             'interface_namespace' => $interfaceNamespace,
             'model_name' => $name,
             'model_namespace' => 'App\\Models',
             'base_namespace' => $baseNamespace,
+            'author' => 'Laravel Architex',
+            'year' => '2025',
         ]);
         
         $this->createFile($implementationPath, $implementationContent);
@@ -92,6 +89,34 @@ class ArchitectureGenerator
             $serviceFiles = $this->generateServiceForRepository($name, $options);
             $createdFiles = array_merge($createdFiles, $serviceFiles);
         }
+        
+        // Create controller if it doesn't exist
+        $controllerPath = 'app/Http/Controllers/' . $name . 'Controller.php';
+        if (!$this->filesystem->exists($controllerPath)) {
+            $controllerFiles = $this->generateControllerForRepository($name, $options);
+            $createdFiles = array_merge($createdFiles, $controllerFiles);
+        }
+        
+        // Create request files
+        $requestFiles = $this->generateRequestFilesForRepository($name);
+        $createdFiles = array_merge($createdFiles, $requestFiles);
+        
+        // Create repository service provider if it doesn't exist
+        $repositoryServiceProviderPath = $this->config['patterns']['repository']['path'] . '/RepositoryServiceProvider.php';
+        if (!$this->filesystem->exists($repositoryServiceProviderPath)) {
+            $repositoryServiceProviderContent = $this->templateEngine->render('repository/repository-service-provider.stub', [
+                'namespace' => $this->config['patterns']['repository']['namespace'],
+                'class_name' => $name,
+                'author' => 'Laravel Architex',
+                'year' => '2025',
+            ]);
+            
+            $this->createFile($repositoryServiceProviderPath, $repositoryServiceProviderContent);
+            $createdFiles[] = $repositoryServiceProviderPath;
+        }
+        
+        // Register service providers in config/app.php
+        $this->registerServiceProviders($name);
         
         return $createdFiles;
     }
@@ -111,7 +136,7 @@ class ArchitectureGenerator
         
         $serviceInterfacePath = $serviceConfig['path'] . '/Interfaces/' . $serviceInterfaceName . '.php';
         $serviceImplementationPath = $serviceConfig['path'] . '/Implementations/' . $serviceImplementationName . '.php';
-        $serviceProviderPath = $serviceConfig['path'] . '/' . $this->formatName($name, 'ServiceProvider') . '.php';
+        $serviceProviderPath = $serviceConfig['path'] . '/ServiceProvider.php';
         
         $serviceInterfaceNamespace = $serviceConfig['namespace'] . '\\Interfaces';
         $serviceImplementationNamespace = $serviceConfig['namespace'] . '\\Implementations';
@@ -121,39 +146,45 @@ class ArchitectureGenerator
         $createdFiles = [];
         
         // Create service interface
-        $serviceInterfaceContent = $this->templateManager->render('repository/services/service-interface.stub', [
+        $serviceInterfaceContent = $this->templateEngine->render('service/interfaces/service-interface.stub', [
             'namespace' => $serviceInterfaceNamespace,
+            'package_namespace' => $serviceInterfaceNamespace,
             'class_name' => $name,
             'class_name_lower' => strtolower($name),
+            'author' => 'Laravel Architex',
+            'year' => '2025',
         ]);
         
         $this->createFile($serviceInterfacePath, $serviceInterfaceContent);
         $createdFiles[] = $serviceInterfacePath;
         
         // Create service implementation
-        $serviceImplementationContent = $this->templateManager->render('repository/services/service.stub', [
+        $serviceImplementationContent = $this->templateEngine->render('service/implementations/service-implementation.stub', [
             'namespace' => $serviceImplementationNamespace,
             'class_name' => $name,
             'class_name_lower' => strtolower($name),
             'repository_interface_name' => $repositoryInterfaceName,
             'repository_interface_namespace' => $repositoryInterfaceNamespace,
+            'service_interface_namespace' => $serviceInterfaceNamespace,
+            'author' => 'Laravel Architex',
+            'year' => '2025',
         ]);
         
         $this->createFile($serviceImplementationPath, $serviceImplementationContent);
         $createdFiles[] = $serviceImplementationPath;
         
-        // Create service provider
-        $serviceProviderContent = $this->templateManager->render('service/service-provider.stub', [
-            'namespace' => $serviceProviderNamespace,
-            'class_name' => $name,
-            'service_interface_name' => $serviceInterfaceName,
-            'service_interface_namespace' => $serviceInterfaceNamespace,
-            'service_implementation_name' => $serviceImplementationName,
-            'service_implementation_namespace' => $serviceImplementationNamespace,
-        ]);
-        
-        $this->createFile($serviceProviderPath, $serviceProviderContent);
-        $createdFiles[] = $serviceProviderPath;
+        // Create service provider if it doesn't exist
+        if (!$this->filesystem->exists($serviceProviderPath)) {
+            $serviceProviderContent = $this->templateEngine->render('service/service-provider.stub', [
+                'namespace' => $serviceProviderNamespace,
+                'class_name' => $name,
+                'author' => 'Laravel Architex',
+                'year' => '2025',
+            ]);
+            
+            $this->createFile($serviceProviderPath, $serviceProviderContent);
+            $createdFiles[] = $serviceProviderPath;
+        }
         
         return $createdFiles;
     }
@@ -170,7 +201,7 @@ class ArchitectureGenerator
         $servicePath = $config['path'] . '/' . $serviceName . '.php';
         $serviceNamespace = $config['namespace'];
         
-        $serviceContent = $this->templateManager->render('service/base-service.stub', [
+        $serviceContent = $this->templateEngine->render('service/base-service.stub', [
             'namespace' => $serviceNamespace,
             'class_name' => $serviceName,
             'model_name' => $name,
@@ -199,7 +230,7 @@ class ArchitectureGenerator
         
         // Create Command
         $commandPath = $config['commands']['path'] . '/' . $commandName . '.php';
-        $commandContent = $this->templateManager->render('cqrs/commands/command.stub', [
+        $commandContent = $this->templateEngine->render('cqrs/commands/command.stub', [
             'namespace' => $config['commands']['namespace'],
             'class_name' => $commandName,
             'model_name' => $name,
@@ -209,7 +240,7 @@ class ArchitectureGenerator
         
         // Create Query
         $queryPath = $config['queries']['path'] . '/' . $queryName . '.php';
-        $queryContent = $this->templateManager->render('cqrs/queries/query.stub', [
+        $queryContent = $this->templateEngine->render('cqrs/queries/query.stub', [
             'namespace' => $config['queries']['namespace'],
             'class_name' => $queryName,
             'model_name' => $name,
@@ -219,7 +250,7 @@ class ArchitectureGenerator
         
         // Create Command Handler
         $commandHandlerPath = $config['handlers']['path'] . '/' . $commandHandlerName . '.php';
-        $commandHandlerContent = $this->templateManager->render('cqrs/handlers/command-handler.stub', [
+        $commandHandlerContent = $this->templateEngine->render('cqrs/handlers/command-handler.stub', [
             'namespace' => $config['handlers']['namespace'],
             'class_name' => $commandHandlerName,
             'command_name' => $commandName,
@@ -232,7 +263,7 @@ class ArchitectureGenerator
         
         // Create Query Handler
         $queryHandlerPath = $config['handlers']['path'] . '/' . $queryHandlerName . '.php';
-        $queryHandlerContent = $this->templateManager->render('cqrs/handlers/query-handler.stub', [
+        $queryHandlerContent = $this->templateEngine->render('cqrs/handlers/query-handler.stub', [
             'namespace' => $config['handlers']['namespace'],
             'class_name' => $queryHandlerName,
             'query_name' => $queryName,
@@ -269,7 +300,7 @@ class ArchitectureGenerator
                 $sampleFileName = $moduleName . Str::studly($subDir) . '.php';
                 $sampleFilePath = $subPath . '/' . $sampleFileName;
                 
-                $sampleContent = $this->templateManager->render('ddd/ddd-sample.stub', [
+                $sampleContent = $this->templateEngine->render('ddd/ddd-sample.stub', [
                     'namespace' => $namespace,
                     'class_name' => $moduleName . Str::studly($subDir),
                     'layer' => $layerName,
@@ -301,7 +332,7 @@ class ArchitectureGenerator
         $createdFiles = [];
         
         // Create Event
-        $eventContent = $this->templateManager->render('event-bus/events/event.stub', [
+        $eventContent = $this->templateEngine->render('event-bus/events/event.stub', [
             'namespace' => $config['events']['namespace'],
             'class_name' => $eventName,
             'model_name' => $name,
@@ -310,7 +341,7 @@ class ArchitectureGenerator
         $createdFiles[] = $eventPath;
         
         // Create Listener
-        $listenerContent = $this->templateManager->render('event_bus', 'listener', [
+        $listenerContent = $this->templateEngine->render('event-bus/listeners/listener.stub', [
             'namespace' => $config['listeners']['namespace'],
             'class_name' => $listenerName,
             'event_name' => $eventName,
@@ -358,7 +389,7 @@ class ArchitectureGenerator
         // Generate Module Service Provider
         $providerName = $moduleName . 'ServiceProvider';
         $providerPath = $basePath . '/Providers/' . $providerName . '.php';
-        $providerContent = $this->templateManager->render('modular/providers/modular-service-provider.stub', [
+        $providerContent = $this->templateEngine->render('modular/providers/modular-service-provider.stub', [
             'namespace' => $namespace . '\\Providers',
             'class_name' => $providerName,
             'module_name' => $moduleName,
@@ -374,7 +405,7 @@ class ArchitectureGenerator
         // Generate Module Routes
         if ($options['with_routes'] ?? false) {
             $routesPath = $basePath . '/Routes/web.php';
-            $routesContent = $this->templateManager->render('modular/routes/modular-routes.stub', [
+            $routesContent = $this->templateEngine->render('modular/routes/modular-routes.stub', [
                 'module_name' => $moduleName,
                 'module_namespace' => $namespace,
                 'strtolower(class_name)' => strtolower($moduleName),
@@ -386,7 +417,7 @@ class ArchitectureGenerator
         // Generate Module Config
         if ($options['with_config'] ?? false) {
             $configPath = $basePath . '/Config/' . strtolower($moduleName) . '.php';
-            $configContent = $this->templateManager->render('modular/config/modular-config.stub', [
+            $configContent = $this->templateEngine->render('modular/config/modular-config.stub', [
                 'module_name' => $moduleName,
                 'module_namespace' => $namespace,
                 'strtolower(class_name)' => strtolower($moduleName),
@@ -399,7 +430,7 @@ class ArchitectureGenerator
         // Generate Base Controller
         $controllerName = $moduleName . 'Controller';
         $controllerPath = $basePath . '/Controllers/' . $controllerName . '.php';
-        $controllerContent = $this->templateManager->render('modular/controllers/modular-controller.stub', [
+        $controllerContent = $this->templateEngine->render('modular/controllers/modular-controller.stub', [
             'namespace' => $namespace . '\\Controllers',
             'class_name' => $controllerName,
             'module_name' => $moduleName,
@@ -412,7 +443,7 @@ class ArchitectureGenerator
         // Generate Base Model
         $modelName = $moduleName;
         $modelPath = $basePath . '/Models/' . $modelName . '.php';
-        $modelContent = $this->templateManager->render('modular/models/modular-model.stub', [
+        $modelContent = $this->templateEngine->render('modular/models/modular-model.stub', [
             'namespace' => $namespace . '\\Models',
             'class_name' => $modelName,
             'module_name' => $moduleName,
@@ -425,7 +456,7 @@ class ArchitectureGenerator
         // Generate Base Service
         $serviceName = $moduleName . 'Service';
         $servicePath = $basePath . '/Services/' . $serviceName . '.php';
-        $serviceContent = $this->templateManager->render('modular/services/modular-service.stub', [
+        $serviceContent = $this->templateEngine->render('modular/services/modular-service.stub', [
             'namespace' => $namespace . '\\Services',
             'class_name' => $serviceName,
             'module_name' => $moduleName,
@@ -439,7 +470,7 @@ class ArchitectureGenerator
         // Generate Base Repository
         $repositoryName = $moduleName . 'Repository';
         $repositoryPath = $basePath . '/Repositories/' . $repositoryName . '.php';
-        $repositoryContent = $this->templateManager->render('modular/repositories/modular-repository.stub', [
+        $repositoryContent = $this->templateEngine->render('modular/repositories/modular-repository.stub', [
             'namespace' => $namespace . '\\Repositories',
             'class_name' => $repositoryName,
             'module_name' => $moduleName,
@@ -454,7 +485,7 @@ class ArchitectureGenerator
         if ($options['with_migrations'] ?? false) {
             $migrationName = 'create_' . strtolower(Str::plural($moduleName)) . '_table';
             $migrationPath = $basePath . '/Database/Migrations/' . date('Y_m_d_His') . '_' . $migrationName . '.php';
-            $migrationContent = $this->templateManager->render('modular/database/migrations/modular-migration.stub', [
+            $migrationContent = $this->templateEngine->render('modular/database/migrations/modular-migration.stub', [
                 'table_name' => strtolower(Str::plural($moduleName)),
                 'class_name' => 'Create' . Str::plural($moduleName) . 'Table',
             ]);
@@ -466,7 +497,7 @@ class ArchitectureGenerator
         if ($options['with_seeders'] ?? false) {
             $seederName = $moduleName . 'Seeder';
             $seederPath = $basePath . '/Database/Seeders/' . $seederName . '.php';
-            $seederContent = $this->templateManager->render('modular/database/seeders/modular-seeder.stub', [
+            $seederContent = $this->templateEngine->render('modular/database/seeders/modular-seeder.stub', [
                 'namespace' => $namespace . '\\Database\\Seeders',
                 'class_name' => $seederName,
                 'module_name' => $moduleName,
@@ -482,7 +513,7 @@ class ArchitectureGenerator
         if ($options['with_tests'] ?? false) {
             $testName = $moduleName . 'Test';
             $testPath = $basePath . '/Tests/' . $testName . '.php';
-            $testContent = $this->templateManager->render('modular/tests/modular-test.stub', [
+            $testContent = $this->templateEngine->render('modular/tests/modular-test.stub', [
                 'namespace' => $namespace . '\\Tests',
                 'class_name' => $testName,
                 'module_name' => $moduleName,
@@ -495,7 +526,7 @@ class ArchitectureGenerator
         
         // Generate Module README
         $readmePath = $basePath . '/README.md';
-                    $readmeContent = $this->templateManager->render('modular/modular-readme.stub', [
+                    $readmeContent = $this->templateEngine->render('modular/modular-readme.stub', [
             'module_name' => $moduleName,
             'module_namespace' => $namespace,
             'strtolower(class_name)' => strtolower($moduleName),
@@ -546,7 +577,7 @@ class ArchitectureGenerator
         // Generate Domain Entity
         $entityName = $name;
         $entityPath = $domainPath . '/Entities/' . $entityName . '.php';
-        $entityContent = $this->templateManager->render('hexagonal/domain/entities/hexagonal-domain-entity.stub', [
+        $entityContent = $this->templateEngine->render('hexagonal/domain/entities/hexagonal-domain-entity.stub', [
             'namespace' => $namespace,
             'class_name' => $entityName,
         ]);
@@ -556,7 +587,7 @@ class ArchitectureGenerator
         // Generate Repository Port
         $repositoryPortName = $name . 'RepositoryPort';
         $repositoryPortPath = $domainPath . '/Ports/' . $repositoryPortName . '.php';
-        $repositoryPortContent = $this->templateManager->render('hexagonal/domain/ports/hexagonal-domain-repository-port.stub', [
+        $repositoryPortContent = $this->templateEngine->render('hexagonal/domain/ports/hexagonal-domain-repository-port.stub', [
             'namespace' => $namespace . '\\Domain\\Ports',
             'class_name' => $name,
             'strtolower(class_name)' => strtolower($name),
@@ -567,7 +598,7 @@ class ArchitectureGenerator
         // Generate Service Port
         $servicePortName = $name . 'ServicePort';
         $servicePortPath = $domainPath . '/Ports/' . $servicePortName . '.php';
-        $servicePortContent = $this->templateManager->render('hexagonal/domain/ports/hexagonal-domain-service-port.stub', [
+        $servicePortContent = $this->templateEngine->render('hexagonal/domain/ports/hexagonal-domain-service-port.stub', [
             'namespace' => $namespace . '\\Domain\\Ports',
             'class_name' => $name,
             'strtolower(class_name)' => strtolower($name),
@@ -578,7 +609,7 @@ class ArchitectureGenerator
         // Generate Application Service
         $applicationServiceName = $name . 'ApplicationService';
         $applicationServicePath = $applicationPath . '/Services/' . $applicationServiceName . '.php';
-        $applicationServiceContent = $this->templateManager->render('hexagonal/application/hexagonal-application-service.stub', [
+        $applicationServiceContent = $this->templateEngine->render('hexagonal/application/hexagonal-application-service.stub', [
             'namespace' => $namespace . '\\Application\\Services',
             'class_name' => $name,
             'strtolower(class_name)' => strtolower($name),
@@ -589,7 +620,7 @@ class ArchitectureGenerator
         // Generate Infrastructure Repository Adapter
         $repositoryAdapterName = $name . 'RepositoryAdapter';
         $repositoryAdapterPath = $infrastructurePath . '/Adapters/' . $repositoryAdapterName . '.php';
-        $repositoryAdapterContent = $this->templateManager->render('hexagonal/infrastructure/adapters/hexagonal-infrastructure-repository-adapter.stub', [
+        $repositoryAdapterContent = $this->templateEngine->render('hexagonal/infrastructure/adapters/hexagonal-infrastructure-repository-adapter.stub', [
             'namespace' => $namespace . '\\Infrastructure\\Adapters',
             'class_name' => $name,
             'strtolower(class_name)' => strtolower($name),
@@ -600,7 +631,7 @@ class ArchitectureGenerator
         // Generate UI Controller Adapter
         $controllerAdapterName = $name . 'ControllerAdapter';
         $controllerAdapterPath = $uiPath . '/Adapters/' . $controllerAdapterName . '.php';
-        $controllerAdapterContent = $this->templateManager->render('hexagonal/ui/adapters/hexagonal-ui-controller-adapter.stub', [
+        $controllerAdapterContent = $this->templateEngine->render('hexagonal/ui/adapters/hexagonal-ui-controller-adapter.stub', [
             'namespace' => $namespace . '\\UI\\Adapters',
             'class_name' => $name,
             'strtolower(class_name)' => strtolower($name),
@@ -611,7 +642,7 @@ class ArchitectureGenerator
         // Generate Service Provider
         $serviceProviderName = $name . 'ServiceProvider';
         $serviceProviderPath = $basePath . '/' . $serviceProviderName . '.php';
-        $serviceProviderContent = $this->templateManager->render('hexagonal/shared/hexagonal-service-provider.stub', [
+        $serviceProviderContent = $this->templateEngine->render('hexagonal/shared/hexagonal-service-provider.stub', [
             'namespace' => $namespace,
             'class_name' => $name,
             'strtolower(class_name)' => strtolower($name),
@@ -622,7 +653,7 @@ class ArchitectureGenerator
         // Generate Routes
         if ($options['with_routes'] ?? false) {
             $routesPath = $uiPath . '/routes/' . strtolower($name) . '_routes.php';
-            $routesContent = $this->templateManager->render('hexagonal/ui/routes/hexagonal-routes.stub', [
+            $routesContent = $this->templateEngine->render('hexagonal/ui/routes/hexagonal-routes.stub', [
                 'namespace' => $namespace . '\\UI\\Adapters',
                 'class_name' => $name,
                 'strtolower(class_name)' => strtolower($name),
@@ -635,7 +666,7 @@ class ArchitectureGenerator
         if ($options['with_migrations'] ?? false) {
             $migrationName = 'create_' . strtolower(Str::plural($name)) . '_table';
             $migrationPath = $infrastructurePath . '/database/migrations/' . date('Y_m_d_His') . '_' . $migrationName . '.php';
-            $migrationContent = $this->templateManager->render('hexagonal/infrastructure/database/hexagonal-migration.stub', [
+            $migrationContent = $this->templateEngine->render('hexagonal/infrastructure/database/hexagonal-migration.stub', [
                 'strtolower(class_name)' => strtolower($name),
             ]);
             $this->createFile($migrationPath, $migrationContent);
@@ -646,13 +677,167 @@ class ArchitectureGenerator
         if ($options['with_tests'] ?? false) {
             $testName = $name . 'HexagonalTest';
             $testPath = $basePath . '/Tests/' . $testName . '.php';
-            $testContent = $this->templateManager->render('hexagonal/shared/hexagonal-test.stub', [
+            $testContent = $this->templateEngine->render('hexagonal/shared/hexagonal-test.stub', [
                 'namespace' => $namespace . '\\Tests',
                 'class_name' => $name,
                 'strtolower(class_name)' => strtolower($name),
             ]);
             $this->createFile($testPath, $testContent);
             $createdFiles[] = $testPath;
+        }
+        
+        return $createdFiles;
+    }
+
+    /**
+     * Add binding to service provider
+     */
+    private function addBindingToServiceProvider(string $providerPath, string $name, string $serviceInterfaceName, string $serviceImplementationName, string $repositoryInterfaceName): void
+    {
+        if (!$this->filesystem->exists($providerPath)) {
+            // Create service provider if it doesn't exist
+            $serviceProviderContent = $this->templateEngine->render('service/service-provider.stub', [
+                'namespace' => 'App\\Services',
+                'class_name' => $name,
+                'author' => 'Laravel Architex',
+                'year' => '2025',
+            ]);
+            
+            $this->createFile($providerPath, $serviceProviderContent);
+            $content = $serviceProviderContent;
+        } else {
+            $content = $this->filesystem->get($providerPath);
+        }
+        
+        // Add repository binding if not exists
+        $repositoryBinding = "\$this->app->bind(\\App\\Repositories\\Interfaces\\{$name}RepositoryInterface::class, \\App\\Repositories\\{$name}Repository::class);";
+        if (strpos($content, $repositoryBinding) === false) {
+            $content = str_replace(
+                '// Repository bindings',
+                "// Repository bindings\n        " . $repositoryBinding,
+                $content
+            );
+        }
+        
+        // Add service binding if not exists
+        $serviceBinding = "\$this->app->bind(\\App\\Services\\Interfaces\\{$serviceInterfaceName}::class, \\App\\Services\\Implementations\\{$serviceImplementationName}::class);";
+        if (strpos($content, $serviceBinding) === false) {
+            $content = str_replace(
+                '// Service bindings',
+                "// Service bindings\n        " . $serviceBinding,
+                $content
+            );
+        }
+        
+        $this->filesystem->put($providerPath, $content);
+    }
+
+    /**
+     * Register service provider in config/app.php
+     */
+    private function registerServiceProviderInConfig(): void
+    {
+        $configPath = 'config/app.php';
+        
+        if (!$this->filesystem->exists($configPath)) {
+            return;
+        }
+
+        $content = $this->filesystem->get($configPath);
+        
+        // Check if service provider is already registered
+        if (strpos($content, 'App\\Services\\ServiceProvider::class') !== false) {
+            return;
+        }
+        
+        // Add service provider to the providers array
+        $serviceProviderLine = "        App\\Services\\ServiceProvider::class,";
+        
+        // Find the last provider in the Application Service Providers section
+        $pattern = '/(\s+App\\\\.*ServiceProvider::class,)/';
+        if (preg_match_all($pattern, $content, $matches)) {
+            $lastProvider = end($matches[0]);
+            $content = str_replace(
+                $lastProvider,
+                $lastProvider . "\n" . $serviceProviderLine,
+                $content
+            );
+        } else {
+            // If no application providers found, add after RouteServiceProvider
+            $content = str_replace(
+                'App\Providers\RouteServiceProvider::class,',
+                "App\Providers\RouteServiceProvider::class,\n" . $serviceProviderLine,
+                $content
+            );
+        }
+        
+        $this->filesystem->put($configPath, $content);
+    }
+
+    /**
+     * Generate controller for repository pattern
+     */
+    private function generateControllerForRepository(string $name, array $options = []): array
+    {
+        $controllerName = $name . 'Controller';
+        $controllerPath = 'app/Http/Controllers/' . $controllerName . '.php';
+        
+        $createdFiles = [];
+        
+        // Check if service layer is enabled
+        if (!empty($options['with_service'])) {
+            $serviceInterfaceName = $this->formatName($name, $this->config['naming']['suffixes']['service_interface']);
+            $serviceInterfaceNamespace = $this->config['patterns']['service']['namespace'] . '\\Interfaces';
+            
+            $controllerContent = $this->templateEngine->render('repository/controllers/controller-with-service.stub', [
+                'class_name' => $name,
+                'class_name_lower' => strtolower($name),
+                'service_interface_name' => $serviceInterfaceName,
+                'service_interface_namespace' => $serviceInterfaceNamespace,
+            ]);
+        } else {
+            $repositoryInterfaceName = $this->formatName($name, $this->config['naming']['suffixes']['repository_interface']);
+            $repositoryInterfaceNamespace = $this->config['patterns']['repository']['namespace'] . '\\Interfaces';
+            
+            $controllerContent = $this->templateEngine->render('repository/controllers/controller-with-repository.stub', [
+                'class_name' => $name,
+                'class_name_lower' => strtolower($name),
+                'repository_interface_name' => $repositoryInterfaceName,
+                'repository_interface_namespace' => $repositoryInterfaceNamespace,
+            ]);
+        }
+        
+        $this->createFile($controllerPath, $controllerContent);
+        $createdFiles[] = $controllerPath;
+        
+        return $createdFiles;
+    }
+
+    /**
+     * Generate request files for repository pattern
+     */
+    private function generateRequestFilesForRepository(string $name): array
+    {
+        $createdFiles = [];
+        
+        // Create store request
+        $storeRequestPath = 'app/Http/Requests/Store' . $name . 'Request.php';
+        if (!$this->filesystem->exists($storeRequestPath)) {
+            $storeRequestContent = $this->templateEngine->render('repository/requests/store-request.stub', [
+                'class_name' => $name,
+            ]);
+            $this->createFile($storeRequestPath, $storeRequestContent);
+            $createdFiles[] = $storeRequestPath;
+        }
+        
+        // Create update request
+        $updateRequestPath = 'app/Http/Requests/Update' . $name . 'Request.php';
+        if (!$this->filesystem->exists($updateRequestPath)) {
+            $updateRequestContent = $this->templateEngine->render('repository/requests/update-request.stub', [
+                'class_name' => $name,
+            ]);
+            $this->createFile($updateRequestPath, $updateRequestContent);
+            $createdFiles[] = $updateRequestPath;
         }
         
         return $createdFiles;
@@ -684,5 +869,46 @@ class ArchitectureGenerator
         }
         
         $this->filesystem->put($path, $content);
+    }
+
+    /**
+     * Register service providers in config/app.php
+     */
+    private function registerServiceProviders(string $name): void
+    {
+        $configPath = 'config/app.php';
+        
+        if (!$this->filesystem->exists($configPath)) {
+            return;
+        }
+        
+        $configContent = $this->filesystem->get($configPath);
+        
+        // Repository Service Provider
+        $repositoryProvider = $this->config['patterns']['repository']['namespace'] . '\\RepositoryServiceProvider::class';
+        
+        // Service Provider
+        $serviceProvider = $this->config['patterns']['service']['namespace'] . '\\ServiceServiceProvider::class';
+        
+        // Check if providers are already registered
+        if (strpos($configContent, $repositoryProvider) === false) {
+            // Add repository provider before Application Service Providers section
+            $configContent = str_replace(
+                '        App\Providers\AppServiceProvider::class,',
+                "        $repositoryProvider,\n        App\Providers\AppServiceProvider::class,",
+                $configContent
+            );
+        }
+        
+        if (strpos($configContent, $serviceProvider) === false) {
+            // Add service provider before Application Service Providers section
+            $configContent = str_replace(
+                '        App\Providers\AppServiceProvider::class,',
+                "        $serviceProvider,\n        App\Providers\AppServiceProvider::class,",
+                $configContent
+            );
+        }
+        
+        $this->filesystem->put($configPath, $configContent);
     }
 } 

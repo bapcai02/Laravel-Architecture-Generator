@@ -23,8 +23,9 @@ class SimpleTemplateEngine
     {
         $content = $this->getTemplateContent($templateName);
         
-        // Merge with default variables
-        $variables = array_merge($this->config['variables'] ?? [], $variables);
+        // Merge with default variables, but allow explicit variables to override
+        $defaultVariables = $this->config['variables'] ?? [];
+        $variables = array_merge($defaultVariables, $variables);
         
         // Process conditionals and loops
         $content = $this->processConditionals($content, $variables);
@@ -127,16 +128,8 @@ class SimpleTemplateEngine
     protected function replaceVariables(string $content, array $variables): string
     {
         foreach ($variables as $key => $value) {
-            $placeholders = [
-                '{{' . $key . '}}',
-                '{{ ' . $key . ' }}',
-                '{{' . $key . ' }}',
-                '{{ ' . $key . '}}'
-            ];
-            
-            foreach ($placeholders as $placeholder) {
-                $content = str_replace($placeholder, $value, $content);
-            }
+            // Use preg_replace to ensure we only replace each placeholder once
+            $content = preg_replace('/\{\{\s*' . preg_quote($key, '/') . '\s*\}\}/', $value, $content);
         }
         
         return $content;

@@ -12,36 +12,27 @@ use {{base_namespace}}\BaseRepository;
  * @package {{namespace}}
  * @author {{author}}
  * @since {{year}}
+ * 
+ * @method array getAll(array $filters = [])
+ * @method object|null findById(int $id)
+ * @method object create(array $data)
+ * @method object|null update(int $id, array $data)
+ * @method bool delete(int $id)
+ * @method bool exists(int $id)
+ * @method int count(array $filters = [])
+ * @method object|null findBy(string $field, $value)
+ * @method array findByCriteria(array $criteria)
+ * @method \Illuminate\Pagination\LengthAwarePaginator paginate(int $perPage = 15, array $filters = [])
  */
-class {{class_name}} extends BaseRepository implements {{interface_name}}
+class {{class_name}} implements {{interface_name}}
 {
-    protected $model;
+    use BaseRepository;
 
     public function __construct({{model_name}} $model)
     {
-        $this->model = $model;
+        $this->initialize($model);
     }
 
-    {{#if methods}}
-    {{#each methods}}
-    /**
-     * {{description}}
-     {{#each params}}
-     * @param {{type}} ${{name}} {{description}}
-     {{/each}}
-     {{#if return_type}}
-     * @return {{return_type}}
-     {{/if}}
-     */
-    public function {{name}}({{#each params}}{{#if @index}}, {{/if}}{{#if type}}{{type}} {{/if}}${{name}}{{#if default}} = {{default}}{{/if}}{{/each}}){{#if return_type}}: {{return_type}}{{/if}}
-    {
-        {{#each body}}
-        {{this}}
-        {{/each}}
-    }
-
-    {{/each}}
-    {{else}}
     /**
      * Custom method example
      *
@@ -52,22 +43,4 @@ class {{class_name}} extends BaseRepository implements {{interface_name}}
     {
         return $this->model->where('email', $email)->first();
     }
-
-    /**
-     * Custom method example with criteria
-     *
-     * @param array $criteria
-     * @return mixed
-     */
-    public function findByCriteria(array $criteria)
-    {
-        $query = $this->model->newQuery();
-        
-        foreach ($criteria as $field => $value) {
-            $query->where($field, $value);
-        }
-        
-        return $query->get();
-    }
-    {{/if}}
 } 

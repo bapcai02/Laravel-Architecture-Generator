@@ -69,7 +69,10 @@ composer require --dev phpunit/phpunit
 Tests the core functionality of generating different architecture patterns:
 
 - ✅ **Repository Pattern Generation**
+  - Creates BaseRepository trait with common methods
   - Creates interface and implementation files
+  - Creates service layer with dependency injection
+  - Creates service providers with auto-registration
   - Verifies correct file paths and content
   - Tests naming conventions
 

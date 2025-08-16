@@ -1,0 +1,81 @@
+<?php
+
+namespace {{namespace}};
+
+/**
+ * {{class_name}} Service
+ *
+ * @package {{namespace}}
+ * @author {{author}}
+ * @since {{year}}
+ */
+class {{class_name}}
+{
+    /**
+     * Create a new service instance.
+     */
+    public function __construct()
+    {
+        //
+    }
+
+    /**
+     * Get all {{model_name}} records.
+     *
+     * @return \Illuminate\Database\Eloquent\Collection
+     */
+    public function getAll()
+    {
+        // Implementation here
+        return collect();
+    }
+
+    /**
+     * Find {{model_name}} by ID.
+     *
+     * @param int $id
+     * @return \{{model_namespace}}\{{model_name}}|null
+     */
+    public function findById(int $id)
+    {
+        // Implementation here
+        return null;
+    }
+
+    /**
+     * Create a new {{model_name}}.
+     *
+     * @param array $data
+     * @return \{{model_namespace}}\{{model_name}}
+     */
+    public function create(array $data)
+    {
+        // Implementation here
+        return null;
+    }
+
+    /**
+     * Update {{model_name}}.
+     *
+     * @param int $id
+     * @param array $data
+     * @return \{{model_namespace}}\{{model_name}}|null
+     */
+    public function update(int $id, array $data)
+    {
+        // Implementation here
+        return null;
+    }
+
+    /**
+     * Delete {{model_name}}.
+     *
+     * @param int $id
+     * @return bool
+     */
+    public function delete(int $id): bool
+    {
+        // Implementation here
+        return false;
+    }
+} 

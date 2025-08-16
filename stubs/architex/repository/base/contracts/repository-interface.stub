@@ -1,18 +1,18 @@
 <?php
 
-namespace {{namespace}};
+namespace {{base_namespace}}\Contracts;
 
 /**
- * Interface {{class_name}}
+ * Interface RepositoryInterface
  *
- * @package {{namespace}}
+ * @package {{base_namespace}}\Contracts
  * @author {{author}}
  * @since {{year}}
  */
-interface {{class_name}}RepositoryInterface
+interface RepositoryInterface
 {
     /**
-     * Get all {{class_name_lower}}s with optional filters
+     * Get all records with optional filters
      *
      * @param array $filters
      * @return array
@@ -20,7 +20,7 @@ interface {{class_name}}RepositoryInterface
     public function getAll(array $filters = []): array;
 
     /**
-     * Find {{class_name_lower}} by ID
+     * Find record by ID
      *
      * @param int $id
      * @return object|null
@@ -28,7 +28,7 @@ interface {{class_name}}RepositoryInterface
     public function findById(int $id): ?object;
 
     /**
-     * Create new {{class_name_lower}}
+     * Create new record
      *
      * @param array $data
      * @return object
@@ -36,7 +36,7 @@ interface {{class_name}}RepositoryInterface
     public function create(array $data): object;
 
     /**
-     * Update {{class_name_lower}}
+     * Update record
      *
      * @param int $id
      * @param array $data
@@ -45,7 +45,7 @@ interface {{class_name}}RepositoryInterface
     public function update(int $id, array $data): ?object;
 
     /**
-     * Delete {{class_name_lower}}
+     * Delete record
      *
      * @param int $id
      * @return bool
@@ -53,7 +53,7 @@ interface {{class_name}}RepositoryInterface
     public function delete(int $id): bool;
 
     /**
-     * Check if {{class_name_lower}} exists
+     * Check if record exists
      *
      * @param int $id
      * @return bool
@@ -61,15 +61,15 @@ interface {{class_name}}RepositoryInterface
     public function exists(int $id): bool;
 
     /**
-     * Count {{class_name_lower}}s with optional filters
+     * Count records with optional filters
      *
-     * @param int $filters
+     * @param array $filters
      * @return int
      */
     public function count(array $filters = []): int;
 
     /**
-     * Find {{class_name_lower}} by specific field
+     * Find record by specific field
      *
      * @param string $field
      * @param mixed $value
@@ -78,7 +78,7 @@ interface {{class_name}}RepositoryInterface
     public function findBy(string $field, $value): ?object;
 
     /**
-     * Find {{class_name_lower}}s by criteria
+     * Find records by criteria
      *
      * @param array $criteria
      * @return array
@@ -86,11 +86,11 @@ interface {{class_name}}RepositoryInterface
     public function findByCriteria(array $criteria): array;
 
     /**
-     * Paginate {{class_name_lower}}s
+     * Paginate records
      *
      * @param int $perPage
      * @param array $filters
-     * @return \Illuminate\Pagination\LengthAwarePaginator
+     * @return array
      */
-    public function paginate(int $perPage = 15, array $filters = []): \Illuminate\Pagination\LengthAwarePaginator;
+    public function paginate(int $perPage = 15, array $filters = []): array;
 } 

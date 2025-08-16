@@ -71,9 +71,9 @@ The test suite covers:
 
 ```bash
 # Test Repository Pattern
-php artisan make:repository User
+php artisan make:repository User --service
 
-# Test Service Layer
+# Test Service Layer (separate)
 php artisan make:service User
 
 # Test DDD Structure
@@ -108,7 +108,7 @@ php artisan serve
 # Test health check endpoint
 curl http://localhost:8000/api/health
 
-# Test Repository Pattern API
+# Test Repository Pattern API (with service layer)
 curl http://localhost:8000/api/architex-test/users/1
 
 # Test Service Layer API
@@ -141,8 +141,9 @@ php artisan architex:test
 2. Testing Repository Pattern:
 ------------------------------
 ✅ UserRepositoryInterface resolved successfully
-✅ all() method works: 0 users found
-✅ Repository Pattern: PASSED
+✅ UserServiceInterface resolved successfully
+✅ getAll() method works: 0 users found
+✅ Repository Pattern with Service Layer: PASSED
 
 3. Testing CQRS Pattern:
 -----------------------
@@ -154,7 +155,11 @@ php artisan architex:test
 --------------------------------------
 ✅ app/Repositories/Interfaces/UserRepositoryInterface.php exists
 ✅ app/Repositories/UserRepository.php exists
-✅ app/Services/UserService.php exists
+✅ app/Repositories/Base/BaseRepository.php exists
+✅ app/Repositories/RepositoryServiceProvider.php exists
+✅ app/Services/Interfaces/UserServiceInterface.php exists
+✅ app/Services/Implementations/UserService.php exists
+✅ app/Services/ServiceServiceProvider.php exists
 ✅ app/Commands/CreateUserCommand.php exists
 ✅ app/Queries/CreateUserQuery.php exists
 ✅ app/Handlers/CreateUserHandler.php exists

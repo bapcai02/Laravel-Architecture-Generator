@@ -6,7 +6,7 @@ use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\View;
 
-class {{ class_name }} extends ServiceProvider
+class {{ class_name }}ServiceProvider extends ServiceProvider
 {
     /**
      * Register any application services.

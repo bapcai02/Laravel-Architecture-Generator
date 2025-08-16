@@ -166,6 +166,7 @@ return [
             'repository' => 'Repository',
             'repository_interface' => 'RepositoryInterface',
             'service' => 'Service',
+            'service_interface' => 'ServiceInterface',
             'command' => 'Command',
             'query' => 'Query',
             'handler' => 'Handler',
@@ -186,7 +187,7 @@ return [
     |
     */
     'templates' => [
-        'stub_path' => base_path('stubs/architex'),
+        'stub_path' => base_path('stubs/architex/architex'),
         'default_stub_path' => __DIR__ . '/../stubs',
         'variables' => [
             'app_namespace' => 'App',

@@ -3,33 +3,25 @@
 namespace {{namespace}};
 
 use Illuminate\Support\ServiceProvider;
-use {{namespace}}\Interfaces\{{class_name}}ServiceInterface;
-use {{namespace}}\Implementations\{{class_name}}ServiceImplementation;
-use App\Repositories\Interfaces\{{class_name}}RepositoryInterface;
-use App\Repositories\{{class_name}}Repository;
 
 /**
- * {{class_name}} Service Provider
+ * Service Provider for all Services
  *
  * @package {{namespace}}
  * @author {{author}}
  * @since {{year}}
  */
-class {{class_name}}ServiceProvider extends ServiceProvider
+class ServiceServiceProvider extends ServiceProvider
 {
     /**
      * Register services.
      */
     public function register(): void
     {
-        // Bind repository interface to implementation
-        $this->app->bind({{class_name}}RepositoryInterface::class, {{class_name}}Repository::class);
+        // Service bindings
+        $this->app->bind(\App\Services\Interfaces\{{class_name}}ServiceInterface::class, \App\Services\Implementations\{{class_name}}Service::class);
         
-        // Bind service interface to implementation
-        $this->app->bind({{class_name}}ServiceInterface::class, {{class_name}}ServiceImplementation::class);
-        
-        // Bind as singleton if needed
-        // $this->app->singleton({{class_name}}ServiceInterface::class, {{class_name}}ServiceImplementation::class);
+        // Add more service bindings here as needed
     }
 
     /**

@@ -1,11 +1,11 @@
 <?php
 
-namespace {{namespace}}\Interfaces;
+namespace {{namespace}};
 
 /**
  * {{class_name}} Service Interface
  *
- * @package {{namespace}}\Interfaces
+ * @package {{package_namespace}}
  * @author {{author}}
  * @since {{year}}
  */
