@@ -1,0 +1,124 @@
+<?php
+
+namespace {{namespace}}\Domain\Entities;
+
+use {{namespace}}\Domain\ValueObjects\{{class_name}}Id;
+use {{namespace}}\Domain\Events\{{class_name}}Created;
+use {{namespace}}\Domain\Events\{{class_name}}Updated;
+use {{namespace}}\Domain\Events\{{class_name}}Deleted;
+
+/**
+ * {{class_name}} Domain Entity
+ *
+ * @package {{namespace}}\Domain\Entities
+ * @author {{author}}
+ * @since {{year}}
+ */
+class {{class_name}}
+{
+    private {{class_name}}Id $id;
+    private string $name;
+    private string $description;
+    private \DateTimeImmutable $createdAt;
+    private \DateTimeImmutable $updatedAt;
+    private array $domainEvents = [];
+
+    public function __construct(
+        {{class_name}}Id $id,
+        string $name,
+        string $description = ''
+    ) {
+        $this->id = $id;
+        $this->name = $name;
+        $this->description = $description;
+        $this->createdAt = new \DateTimeImmutable();
+        $this->updatedAt = new \DateTimeImmutable();
+        
+        $this->addDomainEvent(new {{class_name}}Created($this));
+    }
+
+    // Identity
+    public function getId(): {{class_name}}Id
+    {
+        return $this->id;
+    }
+
+    // Getters
+    public function getName(): string
+    {
+        return $this->name;
+    }
+
+    public function getDescription(): string
+    {
+        return $this->description;
+    }
+
+    public function getCreatedAt(): \DateTimeImmutable
+    {
+        return $this->createdAt;
+    }
+
+    public function getUpdatedAt(): \DateTimeImmutable
+    {
+        return $this->updatedAt;
+    }
+
+    // Setters with business rules
+    public function changeName(string $name): void
+    {
+        if (empty($name)) {
+            throw new \InvalidArgumentException('Name cannot be empty');
+        }
+        
+        $this->name = $name;
+        $this->updatedAt = new \DateTimeImmutable();
+        $this->addDomainEvent(new {{class_name}}Updated($this));
+    }
+
+    public function changeDescription(string $description): void
+    {
+        $this->description = $description;
+        $this->updatedAt = new \DateTimeImmutable();
+        $this->addDomainEvent(new {{class_name}}Updated($this));
+    }
+
+    // Business logic methods
+    public function isValid(): bool
+    {
+        return !empty($this->name) && strlen($this->name) <= 255;
+    }
+
+    public function delete(): void
+    {
+        $this->addDomainEvent(new {{class_name}}Deleted($this));
+    }
+
+    // Domain Events
+    public function getDomainEvents(): array
+    {
+        return $this->domainEvents;
+    }
+
+    public function clearDomainEvents(): void
+    {
+        $this->domainEvents = [];
+    }
+
+    private function addDomainEvent($event): void
+    {
+        $this->domainEvents[] = $event;
+    }
+
+    // Value object conversion
+    public function toArray(): array
+    {
+        return [
+            'id' => $this->id->getValue(),
+            'name' => $this->name,
+            'description' => $this->description,
+            'created_at' => $this->createdAt->format('Y-m-d H:i:s'),
+            'updated_at' => $this->updatedAt->format('Y-m-d H:i:s'),
+        ];
+    }
+} 

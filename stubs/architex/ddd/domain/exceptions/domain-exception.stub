@@ -1,0 +1,18 @@
+<?php
+
+namespace {{namespace}}\Domain\Exceptions;
+
+/**
+ * {{class_name}} Domain Exception
+ *
+ * @package {{namespace}}\Domain\Exceptions
+ * @author {{author}}
+ * @since {{year}}
+ */
+class {{class_name}}DomainException extends \Exception
+{
+    public function __construct(string $message = '', int $code = 0, \Throwable $previous = null)
+    {
+        parent::__construct($message, $code, $previous);
+    }
+} 

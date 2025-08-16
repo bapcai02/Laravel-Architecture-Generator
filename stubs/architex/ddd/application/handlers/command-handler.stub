@@ -1,0 +1,84 @@
+<?php
+
+namespace {{namespace}}\Application\Handlers;
+
+use {{namespace}}\Application\Commands\{{class_name}}Command;
+use {{namespace}}\Domain\Services\{{class_name}}DomainService;
+use {{namespace}}\Domain\Events\{{class_name}}Created;
+use {{namespace}}\Domain\Events\{{class_name}}Updated;
+use {{namespace}}\Domain\Events\{{class_name}}Deleted;
+
+/**
+ * {{class_name}} Command Handler
+ *
+ * @package {{namespace}}\Application\Handlers
+ * @author {{author}}
+ * @since {{year}}
+ */
+class {{class_name}}CommandHandler
+{
+    public function __construct(
+        private {{class_name}}DomainService $domainService
+    ) {
+    }
+
+    /**
+     * Handle create command
+     */
+    public function handleCreate({{class_name}}Command $command): void
+    {
+        ${{class_name_lower}} = $this->domainService->create{{class_name}}(
+            $command->name,
+            $command->description
+        );
+
+        // Dispatch domain events
+        $this->dispatchDomainEvents(${{class_name_lower}});
+    }
+
+    /**
+     * Handle update command
+     */
+    public function handleUpdate(string $id, {{class_name}}Command $command): void
+    {
+        ${{class_name}}Id = new \{{namespace}}\Domain\ValueObjects\{{class_name}}Id($id);
+        
+        ${{class_name_lower}} = $this->domainService->update{{class_name}}(
+            ${{class_name}}Id,
+            $command->name,
+            $command->description
+        );
+
+        // Dispatch domain events
+        $this->dispatchDomainEvents(${{class_name_lower}});
+    }
+
+    /**
+     * Handle delete command
+     */
+    public function handleDelete(string $id): void
+    {
+        ${{class_name}}Id = new \{{namespace}}\Domain\ValueObjects\{{class_name}}Id($id);
+        
+        ${{class_name_lower}} = $this->domainService->get{{class_name}}ById(${{class_name}}Id);
+        if (${{class_name_lower}}) {
+            $this->domainService->delete{{class_name}}(${{class_name}}Id);
+            $this->dispatchDomainEvents(${{class_name_lower}});
+        }
+    }
+
+    /**
+     * Dispatch domain events
+     */
+    private function dispatchDomainEvents(${{class_name_lower}}): void
+    {
+        $events = ${{class_name_lower}}->getDomainEvents();
+        
+        foreach ($events as $event) {
+            // Dispatch event to event bus
+            event($event);
+        }
+        
+        ${{class_name_lower}}->clearDomainEvents();
+    }
+} 

@@ -1,0 +1,145 @@
+<?php
+
+namespace {{namespace}}\Tests\Infrastructure;
+
+use PHPUnit\Framework\TestCase;
+use {{namespace}}\Infrastructure\Repositories\Eloquent{{class_name}}Repository;
+use {{namespace}}\Infrastructure\Models\{{class_name}}Model;
+use {{namespace}}\Domain\Entities\{{class_name}};
+use {{namespace}}\Domain\ValueObjects\{{class_name}}Id;
+
+/**
+ * {{class_name}} Repository Test
+ *
+ * @package {{namespace}}\Tests\Infrastructure
+ * @author {{author}}
+ * @since {{year}}
+ */
+class {{class_name}}RepositoryTest extends TestCase
+{
+    private Eloquent{{class_name}}Repository $repository;
+    private {{class_name}}Model $model;
+
+    protected function setUp(): void
+    {
+        $this->model = $this->createMock({{class_name}}Model::class);
+        $this->repository = new Eloquent{{class_name}}Repository($this->model);
+    }
+
+    public function test_can_find_by_id(): void
+    {
+        $id = {{class_name}}Id::generate();
+        $modelData = (object) [
+            'id' => $id->getValue(),
+            'name' => 'Test {{class_name}}',
+            'description' => 'Test Description',
+        ];
+
+        $this->model
+            ->expects($this->once())
+            ->method('find')
+            ->with($id->getValue())
+            ->willReturn($modelData);
+
+        $result = $this->repository->findById($id);
+
+        $this->assertInstanceOf({{class_name}}::class, $result);
+        $this->assertEquals($id, $result->getId());
+    }
+
+    public function test_returns_null_when_not_found(): void
+    {
+        $id = {{class_name}}Id::generate();
+
+        $this->model
+            ->expects($this->once())
+            ->method('find')
+            ->with($id->getValue())
+            ->willReturn(null);
+
+        $result = $this->repository->findById($id);
+
+        $this->assertNull($result);
+    }
+
+    public function test_can_find_all(): void
+    {
+        $modelData = collect([
+            (object) ['id' => '1', 'name' => 'Test 1', 'description' => 'Desc 1'],
+            (object) ['id' => '2', 'name' => 'Test 2', 'description' => 'Desc 2'],
+        ]);
+
+        $this->model
+            ->expects($this->once())
+            ->method('all')
+            ->willReturn($modelData);
+
+        $result = $this->repository->findAll();
+
+        $this->assertIsArray($result);
+        $this->assertCount(2, $result);
+        $this->assertInstanceOf({{class_name}}::class, $result[0]);
+    }
+
+    public function test_can_save_new_entity(): void
+    {
+        $id = {{class_name}}Id::generate();
+        ${{class_name_lower}} = new {{class_name}}($id, 'Test {{class_name}}', 'Test Description');
+
+        $this->model
+            ->expects($this->once())
+            ->method('create')
+            ->with(${{class_name_lower}}->toArray());
+
+        $this->repository->save(${{class_name_lower}});
+    }
+
+    public function test_can_delete_entity(): void
+    {
+        $id = {{class_name}}Id::generate();
+
+        $this->model
+            ->expects($this->once())
+            ->method('where')
+            ->with('id', $id->getValue())
+            ->willReturnSelf();
+
+        $this->model
+            ->expects($this->once())
+            ->method('delete');
+
+        $this->repository->delete($id);
+    }
+
+    public function test_can_check_exists(): void
+    {
+        $id = {{class_name}}Id::generate();
+
+        $this->model
+            ->expects($this->once())
+            ->method('where')
+            ->with('id', $id->getValue())
+            ->willReturnSelf();
+
+        $this->model
+            ->expects($this->once())
+            ->method('exists')
+            ->willReturn(true);
+
+        $result = $this->repository->exists($id);
+
+        $this->assertTrue($result);
+    }
+
+    public function test_can_count(): void
+    {
+        $this->model
+            ->expects($this->once())
+            ->method('count')
+            ->willReturn(5);
+
+        $result = $this->repository->count();
+
+        $this->assertEquals(5, $result);
+    }
+} 

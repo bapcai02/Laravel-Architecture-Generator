@@ -5,6 +5,10 @@ namespace {{namespace}};
 use Illuminate\Support\ServiceProvider;
 use {{base_namespace}}\RepositoryService;
 use {{base_namespace}}\Repository;
+use {{namespace}}\Interfaces\{{class_name}}RepositoryInterface;
+use {{namespace}}\{{class_name}}Repository;
+use {{namespace}}\Services\{{class_name}}ServiceInterface;
+use {{namespace}}\Services\{{class_name}}Service;
 
 /**
  * Class RepositoryServiceProvider
@@ -34,6 +38,12 @@ class RepositoryServiceProvider extends ServiceProvider
         $this->app->bind(RepositoryService::class, function ($app) {
             return $app->make('repository');
         });
+
+        // Bind repository interface to implementation
+        $this->app->bind({{class_name}}RepositoryInterface::class, {{class_name}}Repository::class);
+        
+        // Bind service interface to implementation
+        $this->app->bind({{class_name}}ServiceInterface::class, {{class_name}}Service::class);
     }
 
     /**
@@ -65,6 +75,8 @@ class RepositoryServiceProvider extends ServiceProvider
             'repository',
             'repository.facade',
             RepositoryService::class,
+            {{class_name}}RepositoryInterface::class,
+            {{class_name}}ServiceInterface::class,
         ];
     }
 } 

@@ -56,6 +56,7 @@ return [
             'enabled' => true,
             'path' => 'app/Repositories',
             'namespace' => 'App\\Repositories',
+            'base_namespace' => 'App\\Repositories\\Base',
             'interface_suffix' => 'RepositoryInterface',
             'implementation_suffix' => 'Repository',
         ],
@@ -63,7 +64,9 @@ return [
             'enabled' => true,
             'path' => 'app/Services',
             'namespace' => 'App\\Services',
-            'suffix' => 'Service',
+            'base_namespace' => 'App\\Services\\Base',
+            'interface_suffix' => 'ServiceInterface',
+            'implementation_suffix' => 'Service',
         ],
         'cqrs' => [
             'enabled' => true,

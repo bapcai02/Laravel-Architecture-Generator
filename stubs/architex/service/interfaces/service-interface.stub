@@ -1,0 +1,48 @@
+<?php
+
+namespace {{namespace}}\Interfaces;
+
+/**
+ * {{class_name}} Service Interface
+ *
+ * @package {{namespace}}\Interfaces
+ * @author {{author}}
+ * @since {{year}}
+ */
+interface {{class_name}}ServiceInterface
+{
+    /**
+     * Get all {{class_name_lower}}s
+     */
+    public function getAll(array $filters = []): array;
+
+    /**
+     * Find {{class_name_lower}} by ID
+     */
+    public function findById(int $id): ?object;
+
+    /**
+     * Create new {{class_name_lower}}
+     */
+    public function create(array $data): object;
+
+    /**
+     * Update {{class_name_lower}}
+     */
+    public function update(int $id, array $data): ?object;
+
+    /**
+     * Delete {{class_name_lower}}
+     */
+    public function delete(int $id): bool;
+
+    /**
+     * Check if {{class_name_lower}} exists
+     */
+    public function exists(int $id): bool;
+
+    /**
+     * Count {{class_name_lower}}s
+     */
+    public function count(array $filters = []): int;
+} 

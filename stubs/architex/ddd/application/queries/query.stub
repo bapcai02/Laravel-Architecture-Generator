@@ -1,0 +1,21 @@
+<?php
+
+namespace {{namespace}}\Application\Queries;
+
+use {{namespace}}\Domain\ValueObjects\{{class_name}}Id;
+
+/**
+ * {{class_name}} Query
+ *
+ * @package {{namespace}}\Application\Queries
+ * @author {{author}}
+ * @since {{year}}
+ */
+class {{class_name}}Query
+{
+    public function __construct(
+        public readonly ?{{class_name}}Id $id = null,
+        public readonly array $criteria = []
+    ) {
+    }
+} 

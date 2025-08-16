@@ -1,0 +1,118 @@
+<?php
+
+namespace {{namespace}}\UI\Controllers;
+
+use Illuminate\Http\Request;
+use Illuminate\Http\JsonResponse;
+use {{namespace}}\Application\Commands\{{class_name}}Command;
+use {{namespace}}\Application\Queries\{{class_name}}Query;
+use {{namespace}}\Application\Handlers\{{class_name}}CommandHandler;
+use {{namespace}}\Application\Handlers\{{class_name}}QueryHandler;
+use {{namespace}}\Domain\ValueObjects\{{class_name}}Id;
+
+/**
+ * {{class_name}} Controller
+ *
+ * @package {{namespace}}\UI\Controllers
+ * @author {{author}}
+ * @since {{year}}
+ */
+class {{class_name}}Controller
+{
+    public function __construct(
+        private {{class_name}}CommandHandler $commandHandler,
+        private {{class_name}}QueryHandler $queryHandler
+    ) {
+    }
+
+    /**
+     * Display a listing of the resource.
+     */
+    public function index(Request $request): JsonResponse
+    {
+        $query = new {{class_name}}Query(criteria: $request->all());
+        ${{class_name_lower}}s = $this->queryHandler->handleGetAll($query);
+        
+        return response()->json([
+            'data' => ${{class_name_lower}}s,
+            'message' => '{{class_name}}s retrieved successfully'
+        ]);
+    }
+
+    /**
+     * Store a newly created resource in storage.
+     */
+    public function store(Request $request): JsonResponse
+    {
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'description' => 'nullable|string',
+        ]);
+
+        $command = new {{class_name}}Command(
+            name: $request->input('name'),
+            description: $request->input('description', '')
+        );
+
+        $this->commandHandler->handleCreate($command);
+
+        return response()->json([
+            'message' => '{{class_name}} created successfully'
+        ], 201);
+    }
+
+    /**
+     * Display the specified resource.
+     */
+    public function show(string $id): JsonResponse
+    {
+        ${{class_name}}Id = new {{class_name}}Id($id);
+        $query = new {{class_name}}Query(id: ${{class_name}}Id);
+        ${{class_name_lower}} = $this->queryHandler->handleGetById($query);
+
+        if (!${{class_name_lower}}) {
+            return response()->json([
+                'message' => '{{class_name}} not found'
+            ], 404);
+        }
+
+        return response()->json([
+            'data' => ${{class_name_lower}},
+            'message' => '{{class_name}} retrieved successfully'
+        ]);
+    }
+
+    /**
+     * Update the specified resource in storage.
+     */
+    public function update(Request $request, string $id): JsonResponse
+    {
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'description' => 'nullable|string',
+        ]);
+
+        $command = new {{class_name}}Command(
+            name: $request->input('name'),
+            description: $request->input('description', '')
+        );
+
+        $this->commandHandler->handleUpdate($id, $command);
+
+        return response()->json([
+            'message' => '{{class_name}} updated successfully'
+        ]);
+    }
+
+    /**
+     * Remove the specified resource from storage.
+     */
+    public function destroy(string $id): JsonResponse
+    {
+        $this->commandHandler->handleDelete($id);
+
+        return response()->json([
+            'message' => '{{class_name}} deleted successfully'
+        ]);
+    }
+} 

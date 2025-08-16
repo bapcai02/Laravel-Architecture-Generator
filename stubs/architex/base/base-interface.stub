@@ -2,7 +2,11 @@
 
 namespace {{namespace}};
 
-use {{base_namespace}}\Contracts\RepositoryInterface;
+{{#if imports}}
+{{#each imports}}
+use {{this}};
+{{/each}}
+{{/if}}
 
 /**
  * Interface {{class_name}}
@@ -11,7 +15,7 @@ use {{base_namespace}}\Contracts\RepositoryInterface;
  * @author {{author}}
  * @since {{year}}
  */
-interface {{class_name}} extends RepositoryInterface
+interface {{class_name}}{{#if extends}} extends {{extends}}{{/if}}
 {
     {{#if methods}}
     {{#each methods}}
@@ -27,21 +31,5 @@ interface {{class_name}} extends RepositoryInterface
     public function {{name}}({{#each params}}{{#if @index}}, {{/if}}{{#if type}}{{type}} {{/if}}${{name}}{{#if default}} = {{default}}{{/if}}{{/each}}){{#if return_type}}: {{return_type}}{{/if}};
 
     {{/each}}
-    {{else}}
-    /**
-     * Custom method example
-     *
-     * @param string $email
-     * @return mixed
-     */
-    public function findByEmail($email);
-
-    /**
-     * Custom method example with criteria
-     *
-     * @param array $criteria
-     * @return mixed
-     */
-    public function findByCriteria(array $criteria);
     {{/if}}
 } 

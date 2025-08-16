@@ -1,6 +1,6 @@
 # Laravel Architex Installation Guide
 
-Hướng dẫn cài đặt Laravel Architex từ đầu, bao gồm cả việc tạo test Laravel app.
+Complete installation guide for Laravel Architex from scratch, including creating a test Laravel application.
 
 ## 🚀 Prerequisites
 

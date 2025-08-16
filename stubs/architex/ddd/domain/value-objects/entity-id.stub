@@ -1,0 +1,44 @@
+<?php
+
+namespace {{namespace}}\Domain\ValueObjects;
+
+/**
+ * {{class_name}}Id Value Object
+ *
+ * @package {{namespace}}\Domain\ValueObjects
+ * @author {{author}}
+ * @since {{year}}
+ */
+class {{class_name}}Id
+{
+    private string $value;
+
+    public function __construct(string $value)
+    {
+        if (empty($value)) {
+            throw new \InvalidArgumentException('ID cannot be empty');
+        }
+        
+        $this->value = $value;
+    }
+
+    public function getValue(): string
+    {
+        return $this->value;
+    }
+
+    public function equals({{class_name}}Id $other): bool
+    {
+        return $this->value === $other->value;
+    }
+
+    public function __toString(): string
+    {
+        return $this->value;
+    }
+
+    public static function generate(): {{class_name}}Id
+    {
+        return new self(uniqid('{{class_name}}_', true));
+    }
+} 

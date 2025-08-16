@@ -1,0 +1,68 @@
+<?php
+
+namespace {{namespace}}\Application\Handlers;
+
+use {{namespace}}\Application\Queries\{{class_name}}Query;
+use {{namespace}}\Domain\Services\{{class_name}}DomainService;
+use {{namespace}}\Application\DTOs\{{class_name}}DTO;
+
+/**
+ * {{class_name}} Query Handler
+ *
+ * @package {{namespace}}\Application\Handlers
+ * @author {{author}}
+ * @since {{year}}
+ */
+class {{class_name}}QueryHandler
+{
+    public function __construct(
+        private {{class_name}}DomainService $domainService
+    ) {
+    }
+
+    /**
+     * Handle get by ID query
+     */
+    public function handleGetById({{class_name}}Query $query): ?{{class_name}}DTO
+    {
+        if (!$query->id) {
+            return null;
+        }
+
+        ${{class_name_lower}} = $this->domainService->get{{class_name}}ById($query->id);
+        
+        return ${{class_name_lower}} ? {{class_name}}DTO::fromEntity(${{class_name_lower}}) : null;
+    }
+
+    /**
+     * Handle get all query
+     */
+    public function handleGetAll({{class_name}}Query $query): array
+    {
+        ${{class_name_lower}}s = $this->domainService->getAll{{class_name}}s();
+        
+        return array_map(fn(${{class_name_lower}}) => {{class_name}}DTO::fromEntity(${{class_name_lower}}), ${{class_name_lower}}s);
+    }
+
+    /**
+     * Handle search query
+     */
+    public function handleSearch({{class_name}}Query $query): array
+    {
+        ${{class_name_lower}}s = $this->domainService->getAll{{class_name}}s();
+        
+        // Apply criteria filtering
+        if (!empty($query->criteria)) {
+            ${{class_name_lower}}s = array_filter(${{class_name_lower}}s, function(${{class_name_lower}}) use ($query) {
+                foreach ($query->criteria as $field => $value) {
+                    if (${{class_name_lower}}->{'get' . ucfirst($field)}() !== $value) {
+                        return false;
+                    }
+                }
+                return true;
+            });
+        }
+        
+        return array_map(fn(${{class_name_lower}}) => {{class_name}}DTO::fromEntity(${{class_name_lower}}), ${{class_name_lower}}s);
+    }
+} 

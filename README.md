@@ -26,6 +26,12 @@ Laravel Architex is a powerful tool that helps Laravel developers quickly initia
 - PHP >= 7.4
 - Laravel >= 8.0
 
+### CI/CD Status:
+[![Check Comments](https://github.com/laravel-architex/architecture-generator/workflows/Check%20Comments%20Language/badge.svg)](https://github.com/laravel-architex/architecture-generator/actions/workflows/check-comments.yml)
+[![Code Quality](https://github.com/laravel-architex/architecture-generator/workflows/Code%20Quality%20Check/badge.svg)](https://github.com/laravel-architex/architecture-generator/actions/workflows/code-quality.yml)
+[![Test Architectures](https://github.com/laravel-architex/architecture-generator/workflows/Test%20Architecture%20Patterns/badge.svg)](https://github.com/laravel-architex/architecture-generator/actions/workflows/test-architectures.yml)
+[![Release](https://github.com/laravel-architex/architecture-generator/workflows/Release%20Package/badge.svg)](https://github.com/laravel-architex/architecture-generator/actions/workflows/release.yml)
+
 ### Quick Setup (Recommended)
 
 ```bash
@@ -732,6 +738,7 @@ composer install
 - **[DEVELOPMENT.md](DEVELOPMENT.md)** - Development setup, testing, and contributing guide
 - **[TESTING.md](TESTING.md)** - Detailed testing information
 - **[INSTALLATION_GUIDE.md](INSTALLATION_GUIDE.md)** - Step-by-step installation guide
+- **[.github/README.md](.github/README.md)** - GitHub Actions workflows guide
 
 ## 🆘 Support
 

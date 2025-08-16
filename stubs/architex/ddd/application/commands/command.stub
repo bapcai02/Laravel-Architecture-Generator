@@ -1,0 +1,19 @@
+<?php
+
+namespace {{namespace}}\Application\Commands;
+
+/**
+ * {{class_name}} Command
+ *
+ * @package {{namespace}}\Application\Commands
+ * @author {{author}}
+ * @since {{year}}
+ */
+class {{class_name}}Command
+{
+    public function __construct(
+        public readonly string $name,
+        public readonly string $description = ''
+    ) {
+    }
+} 

@@ -1,0 +1,80 @@
+<?php
+
+namespace {{namespace}}\Application\Services;
+
+use {{namespace}}\Application\Commands\{{class_name}}Command;
+use {{namespace}}\Application\Queries\{{class_name}}Query;
+use {{namespace}}\Application\Handlers\{{class_name}}CommandHandler;
+use {{namespace}}\Application\Handlers\{{class_name}}QueryHandler;
+use {{namespace}}\Application\DTOs\{{class_name}}DTO;
+
+/**
+ * {{class_name}} Application Service
+ *
+ * @package {{namespace}}\Application\Services
+ * @author {{author}}
+ * @since {{year}}
+ */
+class {{class_name}}ApplicationService
+{
+    public function __construct(
+        private {{class_name}}CommandHandler $commandHandler,
+        private {{class_name}}QueryHandler $queryHandler
+    ) {
+    }
+
+    /**
+     * Create {{class_name}}
+     */
+    public function create{{class_name}}(string $name, string $description = ''): void
+    {
+        $command = new {{class_name}}Command($name, $description);
+        $this->commandHandler->handleCreate($command);
+    }
+
+    /**
+     * Update {{class_name}}
+     */
+    public function update{{class_name}}(string $id, string $name, string $description = ''): void
+    {
+        $command = new {{class_name}}Command($name, $description);
+        $this->commandHandler->handleUpdate($id, $command);
+    }
+
+    /**
+     * Delete {{class_name}}
+     */
+    public function delete{{class_name}}(string $id): void
+    {
+        $this->commandHandler->handleDelete($id);
+    }
+
+    /**
+     * Get {{class_name}} by ID
+     */
+    public function get{{class_name}}ById(string $id): ?{{class_name}}DTO
+    {
+        ${{class_name}}Id = new \{{namespace}}\Domain\ValueObjects\{{class_name}}Id($id);
+        $query = new {{class_name}}Query(id: ${{class_name}}Id);
+        
+        return $this->queryHandler->handleGetById($query);
+    }
+
+    /**
+     * Get all {{class_name}}s
+     */
+    public function getAll{{class_name}}s(): array
+    {
+        $query = new {{class_name}}Query();
+        return $this->queryHandler->handleGetAll($query);
+    }
+
+    /**
+     * Search {{class_name}}s
+     */
+    public function search{{class_name}}s(array $criteria): array
+    {
+        $query = new {{class_name}}Query(criteria: $criteria);
+        return $this->queryHandler->handleSearch($query);
+    }
+} 

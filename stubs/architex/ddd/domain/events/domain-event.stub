@@ -1,0 +1,36 @@
+<?php
+
+namespace {{namespace}}\Domain\Events;
+
+use {{namespace}}\Domain\Entities\{{class_name}};
+
+/**
+ * {{class_name}} Domain Event Base Class
+ *
+ * @package {{namespace}}\Domain\Events
+ * @author {{author}}
+ * @since {{year}}
+ */
+abstract class {{class_name}}DomainEvent
+{
+    protected {{class_name}} ${{class_name_lower}};
+    protected \DateTimeImmutable $occurredOn;
+
+    public function __construct({{class_name}} ${{class_name_lower}})
+    {
+        $this->{{class_name_lower}} = ${{class_name_lower}};
+        $this->occurredOn = new \DateTimeImmutable();
+    }
+
+    public function get{{class_name}}(): {{class_name}}
+    {
+        return $this->{{class_name_lower}};
+    }
+
+    public function getOccurredOn(): \DateTimeImmutable
+    {
+        return $this->occurredOn;
+    }
+
+    abstract public function getEventName(): string;
+} 

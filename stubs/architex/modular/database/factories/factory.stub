@@ -1,0 +1,52 @@
+<?php
+
+namespace {{namespace}}\Database\Factories;
+
+use Illuminate\Database\Eloquent\Factories\Factory;
+use {{namespace}}\Models\{{class_name}};
+
+/**
+ * {{class_name}} Factory
+ *
+ * @package {{namespace}}\Database\Factories
+ * @author {{author}}
+ * @since {{year}}
+ */
+class {{class_name}}Factory extends Factory
+{
+    /**
+     * The name of the factory's corresponding model.
+     */
+    protected $model = {{class_name}}::class;
+
+    /**
+     * Define the model's default state.
+     */
+    public function definition(): array
+    {
+        return [
+            'name' => $this->faker->words(3, true),
+            'description' => $this->faker->paragraph(),
+        ];
+    }
+
+    /**
+     * Indicate that the {{class_name_lower}} is active.
+     */
+    public function active(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'name' => 'Active ' . $this->faker->words(2, true),
+        ]);
+    }
+
+    /**
+     * Indicate that the {{class_name_lower}} is inactive.
+     */
+    public function inactive(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'name' => 'Inactive ' . $this->faker->words(2, true),
+        ]);
+    }
+} 
