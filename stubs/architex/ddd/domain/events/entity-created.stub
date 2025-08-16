@@ -1,0 +1,20 @@
+<?php
+
+namespace {{namespace}}\Domain\Events;
+
+use {{namespace}}\Domain\Entities\{{class_name}};
+
+/**
+ * {{class_name}} Created Domain Event
+ *
+ * @package {{namespace}}\Domain\Events
+ * @author {{author}}
+ * @since {{year}}
+ */
+class {{class_name}}Created extends {{class_name}}DomainEvent
+{
+    public function getEventName(): string
+    {
+        return '{{class_name}}.created';
+    }
+} 

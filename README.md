@@ -26,6 +26,12 @@ Laravel Architex is a powerful tool that helps Laravel developers quickly initia
 - PHP >= 7.4
 - Laravel >= 8.0
 
+### CI/CD Status:
+[![Check Comments](https://github.com/laravel-architex/architecture-generator/workflows/Check%20Comments%20Language/badge.svg)](https://github.com/laravel-architex/architecture-generator/actions/workflows/check-comments.yml)
+[![Code Quality](https://github.com/laravel-architex/architecture-generator/workflows/Code%20Quality%20Check/badge.svg)](https://github.com/laravel-architex/architecture-generator/actions/workflows/code-quality.yml)
+[![Test Architectures](https://github.com/laravel-architex/architecture-generator/workflows/Test%20Architecture%20Patterns/badge.svg)](https://github.com/laravel-architex/architecture-generator/actions/workflows/test-architectures.yml)
+[![Release](https://github.com/laravel-architex/architecture-generator/workflows/Release%20Package/badge.svg)](https://github.com/laravel-architex/architecture-generator/actions/workflows/release.yml)
+
 ### Quick Setup (Recommended)
 
 ```bash
@@ -103,195 +109,239 @@ class UserController extends Controller
 
 ### 1. Repository Pattern
 
-#### Option A: Traditional Repository Pattern
+Laravel Architex generates a complete repository pattern with clean architecture:
+
+#### Quick Start
 
 ```bash
-# Create repository for User model
+# Generate repository for User model
 php artisan make:repository User
 
-# Create repository with custom model
+# Generate repository with service layer (recommended)
+php artisan make:repository User --service
+
+# Generate repository with custom model
 php artisan make:repository User --model=App\Models\User
 
 # Overwrite existing files
 php artisan make:repository User --force
 ```
 
-**Result:**
-- `app/Repositories/Interfaces/UserRepositoryInterface.php`
-- `app/Repositories/UserRepository.php` (extends BaseRepository)
+#### Generated Structure
 
-#### Option B: RepositoryService Pattern (Recommended)
-
-```bash
-# No need to create individual repositories!
-# Just use RepositoryService for all models
+```
+app/
+├── Repositories/
+│   ├── Base/
+│   │   └── BaseRepository.php          # Trait with common CRUD methods
+│   ├── Interfaces/
+│   │   └── UserRepositoryInterface.php # Repository contract
+│   ├── UserRepository.php              # Implementation + trait usage
+│   └── RepositoryServiceProvider.php   # Repository bindings
+├── Services/
+│   ├── Interfaces/
+│   │   └── UserServiceInterface.php    # Service contract
+│   ├── Implementations/
+│   │   └── UserService.php             # Service implementation
+│   └── ServiceServiceProvider.php      # Service bindings
+└── Http/
+    ├── Controllers/
+    │   └── UserController.php          # Controller with DI
+    └── Requests/
+        ├── StoreUserRequest.php        # Form validation
+        └── UpdateUserRequest.php       # Form validation
 ```
 
-**Usage:**
-```php
-// Clean and simple!
-$users = Repository::model(User::class)->paginate(15);
-$posts = Repository::model(Post::class)->findWhere(['status' => 'published']);
-$orders = Repository::model(Order::class)->with('items')->all();
-```
+#### Key Features
 
-**Benefits:**
-- ✅ No need to create individual repository classes
-- ✅ Single service handles all models
-- ✅ Clean Facade syntax
-- ✅ Easy to test and mock
-- ✅ Consistent API across all models
+- **✅ BaseRepository Trait**: Clean, reusable trait with all common methods
+- **✅ Type Safety**: Each repository implements its own interface
+- **✅ Service Layer**: Business logic separated from data access
+- **✅ Auto Registration**: Service providers automatically registered in config/app.php
+- **✅ Dependency Injection**: Ready to use with Laravel's DI container
+- **✅ PHPDoc Support**: IDE-friendly with proper method annotations
 
-**Base Repository Features:**
-- ✅ Full CRUD operations (create, read, update, delete)
-- ✅ Advanced query methods (findWhere, findWhereIn, etc.)
-- ✅ Pagination support
-- ✅ Criteria pattern for complex queries
-- ✅ Presenter pattern support
-- ✅ Validation integration
-- ✅ Event dispatching
-- ✅ Relationship handling
-- ✅ Search functionality
-- ✅ Ordering and limiting
-- ✅ Scope queries
-
-**RepositoryService Pattern (Recommended):**
-- ✅ Single service for all models
-- ✅ Clean Facade syntax
-- ✅ Dependency injection ready
-- ✅ Contract-based architecture
-- ✅ Easy to test and mock
-- ✅ Reusable across the application
-
-**Usage Examples:**
-
-### 1. Using RepositoryService (Recommended)
-
-```php
-// In your controller
-class UserController extends Controller
-{
-    protected $repositoryService;
-
-    public function __construct(RepositoryServiceInterface $repositoryService)
-    {
-        $this->repositoryService = $repositoryService;
-    }
-
-    public function index()
-    {
-        // Set model and get all users with pagination
-        $users = $this->repositoryService->model(\App\Models\User::class)->paginate(15);
-        
-        // Find by criteria
-        $activeUsers = $this->repositoryService->model(\App\Models\User::class)
-            ->findWhere(['status' => 'active']);
-        
-        // Advanced search
-        $searchResults = $this->repositoryService->model(\App\Models\User::class)
-            ->findWhere([
-                'name' => ['LIKE', '%john%'],
-                'created_at' => ['DATE', '>=', '2023-01-01']
-            ]);
-        
-        // With relationships
-        $usersWithPosts = $this->repositoryService->model(\App\Models\User::class)
-            ->with('posts')->all();
-        
-        return response()->json($users);
-    }
-}
-```
-
-### 2. Using Repository Facade
-
-```php
-// In your controller
-class UserController extends Controller
-{
-    public function index()
-    {
-        // Using Facade - much cleaner!
-        $users = Repository::model(\App\Models\User::class)->paginate(15);
-        
-        $activeUsers = Repository::model(\App\Models\User::class)
-            ->findWhere(['status' => 'active']);
-        
-        $searchResults = Repository::model(\App\Models\User::class)
-            ->findWhere([
-                'name' => ['LIKE', '%john%'],
-                'created_at' => ['DATE', '>=', '2023-01-01']
-            ]);
-        
-        $usersWithPosts = Repository::model(\App\Models\User::class)
-            ->with('posts')->all();
-        
-        return response()->json($users);
-    }
-}
-```
-
-### 3. Using Dependency Injection
-
-```php
-// In your controller
-class UserController extends Controller
-{
-    public function index(RepositoryServiceInterface $repository)
-    {
-        $users = $repository->model(\App\Models\User::class)->paginate(15);
-        return response()->json($users);
-    }
-}
-```
-
-### 4. Complete Usage Examples
+#### BaseRepository Methods
 
 ```php
 // CRUD Operations
-$user = Repository::model(User::class)->create(['name' => 'John', 'email' => 'john@example.com']);
-$user = Repository::model(User::class)->find(1);
-$user = Repository::model(User::class)->update(['name' => 'Jane'], 1);
-Repository::model(User::class)->delete(1);
+$users = $userRepository->getAll(['status' => 'active']);
+$user = $userRepository->findById(1);
+$user = $userRepository->create(['name' => 'John', 'email' => 'john@example.com']);
+$user = $userRepository->update(1, ['name' => 'Jane']);
+$userRepository->delete(1);
 
-// Find Operations
-$user = Repository::model(User::class)->findByField('email', 'john@example.com');
-$users = Repository::model(User::class)->findWhere(['status' => 'active']);
-$users = Repository::model(User::class)->findWhereIn('id', [1, 2, 3]);
-$users = Repository::model(User::class)->findWhereNotIn('id', [1, 2, 3]);
-$users = Repository::model(User::class)->findWhereBetween('created_at', ['2023-01-01', '2023-12-31']);
+// Query Methods
+$user = $userRepository->findBy('email', 'john@example.com');
+$users = $userRepository->findByCriteria(['status' => 'active', 'role' => 'admin']);
+$users = $userRepository->paginate(15, ['status' => 'active']);
+$count = $userRepository->count(['status' => 'active']);
+$exists = $userRepository->exists(1);
+```
 
-// Pagination
-$users = Repository::model(User::class)->paginate(15);
-$users = Repository::model(User::class)->simplePaginate(15);
+#### Usage Examples
 
-// Relationships
-$users = Repository::model(User::class)->with('posts')->all();
-$users = Repository::model(User::class)->withCount('posts')->all();
-$users = Repository::model(User::class)->whereHas('posts', function($query) {
-    $query->where('status', 'published');
-})->all();
+**Usage Examples:**
 
-// Ordering & Limiting
-$users = Repository::model(User::class)->orderBy('created_at', 'desc')->all();
-$users = Repository::model(User::class)->take(10)->all();
-$users = Repository::model(User::class)->limit(10)->all();
+### 1. Using Repository Pattern with Dependency Injection
 
-// Advanced Search
-$users = Repository::model(User::class)->findWhere([
-    'name' => ['LIKE', '%john%'],
-    'created_at' => ['DATE', '>=', '2023-01-01'],
-    'status' => ['IN', ['active', 'pending']]
-]);
+```php
+// In your controller
+class UserController extends Controller
+{
+    public function __construct(
+        private UserServiceInterface $userService
+    ) {}
 
-// Count
-$count = Repository::model(User::class)->count(['status' => 'active']);
+    public function index()
+    {
+        $users = $this->userService->getAllUsers();
+        return response()->json($users);
+    }
 
-// First or Create
-$user = Repository::model(User::class)->firstOrCreate(['email' => 'john@example.com']);
-$user = Repository::model(User::class)->firstOrNew(['email' => 'john@example.com']);
+    public function store(StoreUserRequest $request)
+    {
+        $user = $this->userService->createUser($request->validated());
+        return response()->json($user, 201);
+    }
 
-// Update or Create
+    public function show(int $id)
+    {
+        $user = $this->userService->findUserById($id);
+        return response()->json($user);
+    }
+
+    public function update(UpdateUserRequest $request, int $id)
+    {
+        $user = $this->userService->updateUser($id, $request->validated());
+        return response()->json($user);
+    }
+
+    public function destroy(int $id)
+    {
+        $this->userService->deleteUser($id);
+        return response()->json(['message' => 'User deleted successfully']);
+    }
+}
+```
+
+### 2. Using Service Layer
+
+```php
+// In your service implementation
+class UserService implements UserServiceInterface
+{
+    public function __construct(
+        private UserRepositoryInterface $userRepository
+    ) {}
+
+    public function getAllUsers(): array
+    {
+        return $this->userRepository->getAll();
+    }
+
+    public function findUserById(int $id): ?object
+    {
+        return $this->userRepository->findById($id);
+    }
+
+    public function createUser(array $data): object
+    {
+        // Add business logic here
+        return $this->userRepository->create($data);
+    }
+
+    public function updateUser(int $id, array $data): ?object
+    {
+        // Add business logic here
+        return $this->userRepository->update($id, $data);
+    }
+
+    public function deleteUser(int $id): bool
+    {
+        // Add business logic here
+        return $this->userRepository->delete($id);
+    }
+
+    public function findUserByEmail(string $email): ?object
+    {
+        return $this->userRepository->findByEmail($email);
+    }
+}
+```
+
+### 3. Using Repository Directly
+
+```php
+// In your controller (if you prefer direct repository usage)
+class UserController extends Controller
+{
+    public function __construct(
+        private UserRepositoryInterface $userRepository
+    ) {}
+
+    public function index()
+    {
+        $users = $this->userRepository->getAll(['status' => 'active']);
+        return response()->json($users);
+    }
+
+    public function show(int $id)
+    {
+        $user = $this->userRepository->findById($id);
+        return response()->json($user);
+    }
+}
+```
+
+### 4. Auto Registration
+
+Service providers are automatically registered in `config/app.php`:
+
+```php
+'providers' => [
+    // ... Laravel Framework Service Providers
+    
+    // ... Package Service Providers
+    
+    // ... Application Service Providers
+    App\Repositories\RepositoryServiceProvider::class,  // ✅ Repository bindings
+    App\Services\ServiceServiceProvider::class,         // ✅ Service bindings
+    App\Providers\AppServiceProvider::class,
+    // ...
+],
+```
+
+### 5. Complete Repository Methods
+
+```php
+// CRUD Operations
+$users = $userRepository->getAll(['status' => 'active']);
+$user = $userRepository->findById(1);
+$user = $userRepository->create(['name' => 'John', 'email' => 'john@example.com']);
+$user = $userRepository->update(1, ['name' => 'Jane']);
+$userRepository->delete(1);
+
+// Query Methods
+$user = $userRepository->findBy('email', 'john@example.com');
+$users = $userRepository->findByCriteria(['status' => 'active', 'role' => 'admin']);
+$users = $userRepository->paginate(15, ['status' => 'active']);
+$count = $userRepository->count(['status' => 'active']);
+$exists = $userRepository->exists(1);
+
+// Custom Methods (defined in UserRepository)
+$user = $userRepository->findByEmail('john@example.com');
+```
+
+### 6. Benefits
+
+- **✅ Clean Architecture**: Separation of concerns with repository and service layers
+- **✅ Type Safety**: Each repository implements its own interface
+- **✅ Reusable**: BaseRepository trait provides common functionality
+- **✅ Testable**: Easy to mock interfaces for testing
+- **✅ Auto Registration**: No manual configuration needed
+- **✅ IDE Support**: Full PHPDoc annotations for better development experience
+- **✅ Laravel Integration**: Works seamlessly with Laravel's DI container
 $user = Repository::model(User::class)->updateOrCreate(
     ['email' => 'john@example.com'],
     ['name' => 'John Doe']
@@ -732,6 +782,7 @@ composer install
 - **[DEVELOPMENT.md](DEVELOPMENT.md)** - Development setup, testing, and contributing guide
 - **[TESTING.md](TESTING.md)** - Detailed testing information
 - **[INSTALLATION_GUIDE.md](INSTALLATION_GUIDE.md)** - Step-by-step installation guide
+- **[.github/README.md](.github/README.md)** - GitHub Actions workflows guide
 
 ## 🆘 Support
 

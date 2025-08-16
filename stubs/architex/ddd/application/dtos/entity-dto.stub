@@ -1,0 +1,53 @@
+<?php
+
+namespace {{namespace}}\Application\DTOs;
+
+use {{namespace}}\Domain\Entities\{{class_name}};
+use {{namespace}}\Domain\ValueObjects\{{class_name}}Id;
+
+/**
+ * {{class_name}} Data Transfer Object
+ *
+ * @package {{namespace}}\Application\DTOs
+ * @author {{author}}
+ * @since {{year}}
+ */
+class {{class_name}}DTO
+{
+    public function __construct(
+        public readonly string $id,
+        public readonly string $name,
+        public readonly string $description,
+        public readonly string $createdAt,
+        public readonly string $updatedAt
+    ) {
+    }
+
+    /**
+     * Create DTO from domain entity
+     */
+    public static function fromEntity({{class_name}} ${{class_name_lower}}): self
+    {
+        return new self(
+            ${{class_name_lower}}->getId()->getValue(),
+            ${{class_name_lower}}->getName(),
+            ${{class_name_lower}}->getDescription(),
+            ${{class_name_lower}}->getCreatedAt()->format('Y-m-d H:i:s'),
+            ${{class_name_lower}}->getUpdatedAt()->format('Y-m-d H:i:s')
+        );
+    }
+
+    /**
+     * Convert to array
+     */
+    public function toArray(): array
+    {
+        return [
+            'id' => $this->id,
+            'name' => $this->name,
+            'description' => $this->description,
+            'created_at' => $this->createdAt,
+            'updated_at' => $this->updatedAt,
+        ];
+    }
+} 

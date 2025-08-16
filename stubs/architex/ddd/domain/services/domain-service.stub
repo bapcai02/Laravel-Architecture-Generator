@@ -1,0 +1,95 @@
+<?php
+
+namespace {{namespace}}\Domain\Services;
+
+use {{namespace}}\Domain\Entities\{{class_name}};
+use {{namespace}}\Domain\ValueObjects\{{class_name}}Id;
+use {{namespace}}\Domain\Repositories\{{class_name}}RepositoryInterface;
+
+/**
+ * {{class_name}} Domain Service
+ *
+ * @package {{namespace}}\Domain\Services
+ * @author {{author}}
+ * @since {{year}}
+ */
+class {{class_name}}DomainService
+{
+    private {{class_name}}RepositoryInterface $repository;
+
+    public function __construct({{class_name}}RepositoryInterface $repository)
+    {
+        $this->repository = $repository;
+    }
+
+    /**
+     * Create new {{class_name}}
+     */
+    public function create{{class_name}}(string $name, string $description = ''): {{class_name}}
+    {
+        $id = {{class_name}}Id::generate();
+        ${{class_name_lower}} = new {{class_name}}($id, $name, $description);
+        
+        $this->repository->save(${{class_name_lower}});
+        
+        return ${{class_name_lower}};
+    }
+
+    /**
+     * Update {{class_name}}
+     */
+    public function update{{class_name}}({{class_name}}Id $id, string $name, string $description = ''): {{class_name}}
+    {
+        ${{class_name_lower}} = $this->repository->findById($id);
+        
+        if (!${{class_name_lower}}) {
+            throw new \InvalidArgumentException('{{class_name}} not found');
+        }
+        
+        ${{class_name_lower}}->changeName($name);
+        ${{class_name_lower}}->changeDescription($description);
+        
+        $this->repository->save(${{class_name_lower}});
+        
+        return ${{class_name_lower}};
+    }
+
+    /**
+     * Delete {{class_name}}
+     */
+    public function delete{{class_name}}({{class_name}}Id $id): void
+    {
+        ${{class_name_lower}} = $this->repository->findById($id);
+        
+        if (!${{class_name_lower}}) {
+            throw new \InvalidArgumentException('{{class_name}} not found');
+        }
+        
+        ${{class_name_lower}}->delete();
+        $this->repository->delete($id);
+    }
+
+    /**
+     * Get {{class_name}} by ID
+     */
+    public function get{{class_name}}ById({{class_name}}Id $id): ?{{class_name}}
+    {
+        return $this->repository->findById($id);
+    }
+
+    /**
+     * Get all {{class_name}}s
+     */
+    public function getAll{{class_name}}s(): array
+    {
+        return $this->repository->findAll();
+    }
+
+    /**
+     * Validate {{class_name}} business rules
+     */
+    public function validate{{class_name}}({{class_name}} ${{class_name_lower}}): bool
+    {
+        return ${{class_name_lower}}->isValid();
+    }
+} 

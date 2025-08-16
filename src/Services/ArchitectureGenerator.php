@@ -8,10 +8,10 @@ use Illuminate\Support\Str;
 class ArchitectureGenerator
 {
     protected Filesystem $filesystem;
-    protected TemplateEngine $templateEngine;
+    protected SimpleTemplateEngine $templateEngine;
     protected array $config;
 
-    public function __construct(Filesystem $filesystem, TemplateEngine $templateEngine)
+    public function __construct(Filesystem $filesystem, SimpleTemplateEngine $templateEngine)
     {
         $this->filesystem = $filesystem;
         $this->templateEngine = $templateEngine;
@@ -41,30 +41,24 @@ class ArchitectureGenerator
         $baseNamespace = $config['base_namespace'] ?? $config['namespace'] . '\\Base';
         $basePath = $config['path'] . '/Base/BaseRepository.php';
         
+        // Create BaseRepository
         if (!$this->filesystem->exists($basePath)) {
             $baseContent = $this->templateEngine->render('repository/base/base-repository.stub', [
-                'namespace' => $baseNamespace,
                 'base_namespace' => $baseNamespace,
+                'author' => 'Laravel Architex',
+                'year' => '2025',
             ]);
             $this->createFile($basePath, $baseContent);
             $createdFiles[] = $basePath;
         }
         
-        // Create BaseController if it doesn't exist
-        $baseControllerPath = $config['path'] . '/Base/BaseController.php';
-        
-        if (!$this->filesystem->exists($baseControllerPath)) {
-            $baseControllerContent = $this->templateEngine->render('repository/base/base-controller.stub', [
-                'namespace' => $baseNamespace,
-            ]);
-            $this->createFile($baseControllerPath, $baseControllerContent);
-            $createdFiles[] = $baseControllerPath;
-        }
+
         
         // Create interface
         $interfaceContent = $this->templateEngine->render('repository/interfaces/repository-interface.stub', [
             'namespace' => $interfaceNamespace,
-            'class_name' => $interfaceName,
+            'class_name' => $name,
+            'class_name_lower' => strtolower($name),
             'base_namespace' => $baseNamespace,
             'model_name' => $name,
             'model_namespace' => 'App\\Models',
@@ -77,15 +71,120 @@ class ArchitectureGenerator
         $implementationContent = $this->templateEngine->render('repository/implementations/repository-implementation.stub', [
             'namespace' => $implementationNamespace,
             'class_name' => $implementationName,
+            'class_name_lower' => strtolower($name),
             'interface_name' => $interfaceName,
             'interface_namespace' => $interfaceNamespace,
             'model_name' => $name,
             'model_namespace' => 'App\\Models',
             'base_namespace' => $baseNamespace,
+            'author' => 'Laravel Architex',
+            'year' => '2025',
         ]);
         
         $this->createFile($implementationPath, $implementationContent);
         $createdFiles[] = $implementationPath;
+        
+        // Generate service layer if requested
+        if (!empty($options['with_service'])) {
+            $serviceFiles = $this->generateServiceForRepository($name, $options);
+            $createdFiles = array_merge($createdFiles, $serviceFiles);
+        }
+        
+        // Create controller if it doesn't exist
+        $controllerPath = 'app/Http/Controllers/' . $name . 'Controller.php';
+        if (!$this->filesystem->exists($controllerPath)) {
+            $controllerFiles = $this->generateControllerForRepository($name, $options);
+            $createdFiles = array_merge($createdFiles, $controllerFiles);
+        }
+        
+        // Create request files
+        $requestFiles = $this->generateRequestFilesForRepository($name);
+        $createdFiles = array_merge($createdFiles, $requestFiles);
+        
+        // Create repository service provider if it doesn't exist
+        $repositoryServiceProviderPath = $this->config['patterns']['repository']['path'] . '/RepositoryServiceProvider.php';
+        if (!$this->filesystem->exists($repositoryServiceProviderPath)) {
+            $repositoryServiceProviderContent = $this->templateEngine->render('repository/repository-service-provider.stub', [
+                'namespace' => $this->config['patterns']['repository']['namespace'],
+                'class_name' => $name,
+                'author' => 'Laravel Architex',
+                'year' => '2025',
+            ]);
+            
+            $this->createFile($repositoryServiceProviderPath, $repositoryServiceProviderContent);
+            $createdFiles[] = $repositoryServiceProviderPath;
+        }
+        
+        // Register service providers in config/app.php
+        $this->registerServiceProviders($name);
+        
+        return $createdFiles;
+    }
+
+    /**
+     * Generate service layer for repository pattern
+     */
+    private function generateServiceForRepository(string $name, array $options = []): array
+    {
+        $serviceConfig = $this->config['patterns']['service'];
+        $repositoryConfig = $this->config['patterns']['repository'];
+        $naming = $this->config['naming'];
+        
+        $serviceInterfaceName = $this->formatName($name, $naming['suffixes']['service_interface']);
+        $serviceImplementationName = $this->formatName($name, $naming['suffixes']['service']);
+        $repositoryInterfaceName = $this->formatName($name, $naming['suffixes']['repository_interface']);
+        
+        $serviceInterfacePath = $serviceConfig['path'] . '/Interfaces/' . $serviceInterfaceName . '.php';
+        $serviceImplementationPath = $serviceConfig['path'] . '/Implementations/' . $serviceImplementationName . '.php';
+        $serviceProviderPath = $serviceConfig['path'] . '/ServiceProvider.php';
+        
+        $serviceInterfaceNamespace = $serviceConfig['namespace'] . '\\Interfaces';
+        $serviceImplementationNamespace = $serviceConfig['namespace'] . '\\Implementations';
+        $serviceProviderNamespace = $serviceConfig['namespace'];
+        $repositoryInterfaceNamespace = $repositoryConfig['namespace'] . '\\Interfaces';
+        
+        $createdFiles = [];
+        
+        // Create service interface
+        $serviceInterfaceContent = $this->templateEngine->render('service/interfaces/service-interface.stub', [
+            'namespace' => $serviceInterfaceNamespace,
+            'package_namespace' => $serviceInterfaceNamespace,
+            'class_name' => $name,
+            'class_name_lower' => strtolower($name),
+            'author' => 'Laravel Architex',
+            'year' => '2025',
+        ]);
+        
+        $this->createFile($serviceInterfacePath, $serviceInterfaceContent);
+        $createdFiles[] = $serviceInterfacePath;
+        
+        // Create service implementation
+        $serviceImplementationContent = $this->templateEngine->render('service/implementations/service-implementation.stub', [
+            'namespace' => $serviceImplementationNamespace,
+            'class_name' => $name,
+            'class_name_lower' => strtolower($name),
+            'repository_interface_name' => $repositoryInterfaceName,
+            'repository_interface_namespace' => $repositoryInterfaceNamespace,
+            'service_interface_namespace' => $serviceInterfaceNamespace,
+            'author' => 'Laravel Architex',
+            'year' => '2025',
+        ]);
+        
+        $this->createFile($serviceImplementationPath, $serviceImplementationContent);
+        $createdFiles[] = $serviceImplementationPath;
+        
+        // Create service provider if it doesn't exist
+        if (!$this->filesystem->exists($serviceProviderPath)) {
+            $serviceProviderContent = $this->templateEngine->render('service/service-provider.stub', [
+                'namespace' => $serviceProviderNamespace,
+                'class_name' => $name,
+                'author' => 'Laravel Architex',
+                'year' => '2025',
+            ]);
+            
+            $this->createFile($serviceProviderPath, $serviceProviderContent);
+            $createdFiles[] = $serviceProviderPath;
+        }
         
         return $createdFiles;
     }
@@ -591,6 +690,160 @@ class ArchitectureGenerator
     }
 
     /**
+     * Add binding to service provider
+     */
+    private function addBindingToServiceProvider(string $providerPath, string $name, string $serviceInterfaceName, string $serviceImplementationName, string $repositoryInterfaceName): void
+    {
+        if (!$this->filesystem->exists($providerPath)) {
+            // Create service provider if it doesn't exist
+            $serviceProviderContent = $this->templateEngine->render('service/service-provider.stub', [
+                'namespace' => 'App\\Services',
+                'class_name' => $name,
+                'author' => 'Laravel Architex',
+                'year' => '2025',
+            ]);
+            
+            $this->createFile($providerPath, $serviceProviderContent);
+            $content = $serviceProviderContent;
+        } else {
+            $content = $this->filesystem->get($providerPath);
+        }
+        
+        // Add repository binding if not exists
+        $repositoryBinding = "\$this->app->bind(\\App\\Repositories\\Interfaces\\{$name}RepositoryInterface::class, \\App\\Repositories\\{$name}Repository::class);";
+        if (strpos($content, $repositoryBinding) === false) {
+            $content = str_replace(
+                '// Repository bindings',
+                "// Repository bindings\n        " . $repositoryBinding,
+                $content
+            );
+        }
+        
+        // Add service binding if not exists
+        $serviceBinding = "\$this->app->bind(\\App\\Services\\Interfaces\\{$serviceInterfaceName}::class, \\App\\Services\\Implementations\\{$serviceImplementationName}::class);";
+        if (strpos($content, $serviceBinding) === false) {
+            $content = str_replace(
+                '// Service bindings',
+                "// Service bindings\n        " . $serviceBinding,
+                $content
+            );
+        }
+        
+        $this->filesystem->put($providerPath, $content);
+    }
+
+    /**
+     * Register service provider in config/app.php
+     */
+    private function registerServiceProviderInConfig(): void
+    {
+        $configPath = 'config/app.php';
+        
+        if (!$this->filesystem->exists($configPath)) {
+            return;
+        }
+
+        $content = $this->filesystem->get($configPath);
+        
+        // Check if service provider is already registered
+        if (strpos($content, 'App\\Services\\ServiceProvider::class') !== false) {
+            return;
+        }
+        
+        // Add service provider to the providers array
+        $serviceProviderLine = "        App\\Services\\ServiceProvider::class,";
+        
+        // Find the last provider in the Application Service Providers section
+        $pattern = '/(\s+App\\\\.*ServiceProvider::class,)/';
+        if (preg_match_all($pattern, $content, $matches)) {
+            $lastProvider = end($matches[0]);
+            $content = str_replace(
+                $lastProvider,
+                $lastProvider . "\n" . $serviceProviderLine,
+                $content
+            );
+        } else {
+            // If no application providers found, add after RouteServiceProvider
+            $content = str_replace(
+                'App\Providers\RouteServiceProvider::class,',
+                "App\Providers\RouteServiceProvider::class,\n" . $serviceProviderLine,
+                $content
+            );
+        }
+        
+        $this->filesystem->put($configPath, $content);
+    }
+
+    /**
+     * Generate controller for repository pattern
+     */
+    private function generateControllerForRepository(string $name, array $options = []): array
+    {
+        $controllerName = $name . 'Controller';
+        $controllerPath = 'app/Http/Controllers/' . $controllerName . '.php';
+        
+        $createdFiles = [];
+        
+        // Check if service layer is enabled
+        if (!empty($options['with_service'])) {
+            $serviceInterfaceName = $this->formatName($name, $this->config['naming']['suffixes']['service_interface']);
+            $serviceInterfaceNamespace = $this->config['patterns']['service']['namespace'] . '\\Interfaces';
+            
+            $controllerContent = $this->templateEngine->render('repository/controllers/controller-with-service.stub', [
+                'class_name' => $name,
+                'class_name_lower' => strtolower($name),
+                'service_interface_name' => $serviceInterfaceName,
+                'service_interface_namespace' => $serviceInterfaceNamespace,
+            ]);
+        } else {
+            $repositoryInterfaceName = $this->formatName($name, $this->config['naming']['suffixes']['repository_interface']);
+            $repositoryInterfaceNamespace = $this->config['patterns']['repository']['namespace'] . '\\Interfaces';
+            
+            $controllerContent = $this->templateEngine->render('repository/controllers/controller-with-repository.stub', [
+                'class_name' => $name,
+                'class_name_lower' => strtolower($name),
+                'repository_interface_name' => $repositoryInterfaceName,
+                'repository_interface_namespace' => $repositoryInterfaceNamespace,
+            ]);
+        }
+        
+        $this->createFile($controllerPath, $controllerContent);
+        $createdFiles[] = $controllerPath;
+        
+        return $createdFiles;
+    }
+
+    /**
+     * Generate request files for repository pattern
+     */
+    private function generateRequestFilesForRepository(string $name): array
+    {
+        $createdFiles = [];
+        
+        // Create store request
+        $storeRequestPath = 'app/Http/Requests/Store' . $name . 'Request.php';
+        if (!$this->filesystem->exists($storeRequestPath)) {
+            $storeRequestContent = $this->templateEngine->render('repository/requests/store-request.stub', [
+                'class_name' => $name,
+            ]);
+            $this->createFile($storeRequestPath, $storeRequestContent);
+            $createdFiles[] = $storeRequestPath;
+        }
+        
+        // Create update request
+        $updateRequestPath = 'app/Http/Requests/Update' . $name . 'Request.php';
+        if (!$this->filesystem->exists($updateRequestPath)) {
+            $updateRequestContent = $this->templateEngine->render('repository/requests/update-request.stub', [
+                'class_name' => $name,
+            ]);
+            $this->createFile($updateRequestPath, $updateRequestContent);
+            $createdFiles[] = $updateRequestPath;
+        }
+        
+        return $createdFiles;
+    }
+
+    /**
      * Format name according to naming conventions
      */
     protected function formatName(string $name, string $suffix = ''): string
@@ -616,5 +869,46 @@ class ArchitectureGenerator
         }
         
         $this->filesystem->put($path, $content);
+    }
+
+    /**
+     * Register service providers in config/app.php
+     */
+    private function registerServiceProviders(string $name): void
+    {
+        $configPath = 'config/app.php';
+        
+        if (!$this->filesystem->exists($configPath)) {
+            return;
+        }
+        
+        $configContent = $this->filesystem->get($configPath);
+        
+        // Repository Service Provider
+        $repositoryProvider = $this->config['patterns']['repository']['namespace'] . '\\RepositoryServiceProvider::class';
+        
+        // Service Provider
+        $serviceProvider = $this->config['patterns']['service']['namespace'] . '\\ServiceServiceProvider::class';
+        
+        // Check if providers are already registered
+        if (strpos($configContent, $repositoryProvider) === false) {
+            // Add repository provider before Application Service Providers section
+            $configContent = str_replace(
+                '        App\Providers\AppServiceProvider::class,',
+                "        $repositoryProvider,\n        App\Providers\AppServiceProvider::class,",
+                $configContent
+            );
+        }
+        
+        if (strpos($configContent, $serviceProvider) === false) {
+            // Add service provider before Application Service Providers section
+            $configContent = str_replace(
+                '        App\Providers\AppServiceProvider::class,',
+                "        $serviceProvider,\n        App\Providers\AppServiceProvider::class,",
+                $configContent
+            );
+        }
+        
+        $this->filesystem->put($configPath, $configContent);
     }
 } 

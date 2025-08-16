@@ -2,28 +2,95 @@
 
 namespace {{namespace}};
 
-use {{base_namespace}}\Contracts\RepositoryInterface;
-
 /**
  * Interface {{class_name}}
  *
  * @package {{namespace}}
+ * @author {{author}}
+ * @since {{year}}
  */
-interface {{class_name}} extends RepositoryInterface
+interface {{class_name}}RepositoryInterface
 {
     /**
-     * Custom method example
+     * Get all {{class_name_lower}}s with optional filters
      *
-     * @param string $email
-     * @return mixed
+     * @param array $filters
+     * @return array
      */
-    public function findByEmail($email);
+    public function getAll(array $filters = []): array;
 
     /**
-     * Custom method example with criteria
+     * Find {{class_name_lower}} by ID
+     *
+     * @param int $id
+     * @return object|null
+     */
+    public function findById(int $id): ?object;
+
+    /**
+     * Create new {{class_name_lower}}
+     *
+     * @param array $data
+     * @return object
+     */
+    public function create(array $data): object;
+
+    /**
+     * Update {{class_name_lower}}
+     *
+     * @param int $id
+     * @param array $data
+     * @return object|null
+     */
+    public function update(int $id, array $data): ?object;
+
+    /**
+     * Delete {{class_name_lower}}
+     *
+     * @param int $id
+     * @return bool
+     */
+    public function delete(int $id): bool;
+
+    /**
+     * Check if {{class_name_lower}} exists
+     *
+     * @param int $id
+     * @return bool
+     */
+    public function exists(int $id): bool;
+
+    /**
+     * Count {{class_name_lower}}s with optional filters
+     *
+     * @param int $filters
+     * @return int
+     */
+    public function count(array $filters = []): int;
+
+    /**
+     * Find {{class_name_lower}} by specific field
+     *
+     * @param string $field
+     * @param mixed $value
+     * @return object|null
+     */
+    public function findBy(string $field, $value): ?object;
+
+    /**
+     * Find {{class_name_lower}}s by criteria
      *
      * @param array $criteria
-     * @return mixed
+     * @return array
      */
-    public function findByCriteria(array $criteria);
+    public function findByCriteria(array $criteria): array;
+
+    /**
+     * Paginate {{class_name_lower}}s
+     *
+     * @param int $perPage
+     * @param array $filters
+     * @return \Illuminate\Pagination\LengthAwarePaginator
+     */
+    public function paginate(int $perPage = 15, array $filters = []): \Illuminate\Pagination\LengthAwarePaginator;
 } 

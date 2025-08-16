@@ -1,0 +1,35 @@
+<?php
+
+namespace {{namespace}};
+
+{{#if imports}}
+{{#each imports}}
+use {{this}};
+{{/each}}
+{{/if}}
+
+/**
+ * Interface {{class_name}}
+ *
+ * @package {{namespace}}
+ * @author {{author}}
+ * @since {{year}}
+ */
+interface {{class_name}}{{#if extends}} extends {{extends}}{{/if}}
+{
+    {{#if methods}}
+    {{#each methods}}
+    /**
+     * {{description}}
+     {{#each params}}
+     * @param {{type}} ${{name}} {{description}}
+     {{/each}}
+     {{#if return_type}}
+     * @return {{return_type}}
+     {{/if}}
+     */
+    public function {{name}}({{#each params}}{{#if @index}}, {{/if}}{{#if type}}{{type}} {{/if}}${{name}}{{#if default}} = {{default}}{{/if}}{{/each}}){{#if return_type}}: {{return_type}}{{/if}};
+
+    {{/each}}
+    {{/if}}
+} 

@@ -1,0 +1,109 @@
+<?php
+
+namespace {{namespace}}\Infrastructure\Repositories;
+
+use {{namespace}}\Domain\Entities\{{class_name}};
+use {{namespace}}\Domain\ValueObjects\{{class_name}}Id;
+use {{namespace}}\Domain\Repositories\{{class_name}}RepositoryInterface;
+use {{namespace}}\Infrastructure\Models\{{class_name}}Model;
+
+/**
+ * {{class_name}} Eloquent Repository Implementation
+ *
+ * @package {{namespace}}\Infrastructure\Repositories
+ * @author {{author}}
+ * @since {{year}}
+ */
+class Eloquent{{class_name}}Repository implements {{class_name}}RepositoryInterface
+{
+    public function __construct(
+        private {{class_name}}Model $model
+    ) {
+    }
+
+    /**
+     * Find by ID
+     */
+    public function findById({{class_name}}Id $id): ?{{class_name}}
+    {
+        $model = $this->model->find($id->getValue());
+        
+        return $model ? $this->toEntity($model) : null;
+    }
+
+    /**
+     * Find all
+     */
+    public function findAll(): array
+    {
+        $models = $this->model->all();
+        
+        return array_map(fn($model) => $this->toEntity($model), $models->toArray());
+    }
+
+    /**
+     * Find by criteria
+     */
+    public function findByCriteria(array $criteria): array
+    {
+        $query = $this->model->newQuery();
+        
+        foreach ($criteria as $field => $value) {
+            $query->where($field, $value);
+        }
+        
+        $models = $query->get();
+        
+        return array_map(fn($model) => $this->toEntity($model), $models->toArray());
+    }
+
+    /**
+     * Save entity
+     */
+    public function save({{class_name}} ${{class_name_lower}}): void
+    {
+        $data = ${{class_name_lower}}->toArray();
+        
+        if ($this->exists(${{class_name_lower}}->getId())) {
+            $this->model->where('id', ${{class_name_lower}}->getId()->getValue())->update($data);
+        } else {
+            $this->model->create($data);
+        }
+    }
+
+    /**
+     * Delete entity
+     */
+    public function delete({{class_name}}Id $id): void
+    {
+        $this->model->where('id', $id->getValue())->delete();
+    }
+
+    /**
+     * Check if exists
+     */
+    public function exists({{class_name}}Id $id): bool
+    {
+        return $this->model->where('id', $id->getValue())->exists();
+    }
+
+    /**
+     * Count total
+     */
+    public function count(): int
+    {
+        return $this->model->count();
+    }
+
+    /**
+     * Convert model to domain entity
+     */
+    private function toEntity($model): {{class_name}}
+    {
+        return new {{class_name}}(
+            new {{class_name}}Id($model->id),
+            $model->name,
+            $model->description
+        );
+    }
+} 

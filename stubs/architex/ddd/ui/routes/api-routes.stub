@@ -1,0 +1,15 @@
+<?php
+
+use Illuminate\Support\Facades\Route;
+use {{namespace}}\UI\Controllers\{{class_name}}Controller;
+
+/**
+ * {{class_name}} API Routes
+ */
+Route::prefix('api/{{route_prefix}}')->group(function () {
+    Route::get('/', [{{class_name}}Controller::class, 'index']);
+    Route::post('/', [{{class_name}}Controller::class, 'store']);
+    Route::get('/{id}', [{{class_name}}Controller::class, 'show']);
+    Route::put('/{id}', [{{class_name}}Controller::class, 'update']);
+    Route::delete('/{id}', [{{class_name}}Controller::class, 'destroy']);
+}); 

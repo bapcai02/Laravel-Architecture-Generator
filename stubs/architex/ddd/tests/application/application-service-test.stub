@@ -1,0 +1,115 @@
+<?php
+
+namespace {{namespace}}\Tests\Application;
+
+use PHPUnit\Framework\TestCase;
+use {{namespace}}\Application\Services\{{class_name}}ApplicationService;
+use {{namespace}}\Application\Handlers\{{class_name}}CommandHandler;
+use {{namespace}}\Application\Handlers\{{class_name}}QueryHandler;
+use {{namespace}}\Application\DTOs\{{class_name}}DTO;
+
+/**
+ * {{class_name}} Application Service Test
+ *
+ * @package {{namespace}}\Tests\Application
+ * @author {{author}}
+ * @since {{year}}
+ */
+class {{class_name}}ApplicationServiceTest extends TestCase
+{
+    private {{class_name}}ApplicationService $service;
+    private {{class_name}}CommandHandler $commandHandler;
+    private {{class_name}}QueryHandler $queryHandler;
+
+    protected function setUp(): void
+    {
+        $this->commandHandler = $this->createMock({{class_name}}CommandHandler::class);
+        $this->queryHandler = $this->createMock({{class_name}}QueryHandler::class);
+        
+        $this->service = new {{class_name}}ApplicationService(
+            $this->commandHandler,
+            $this->queryHandler
+        );
+    }
+
+    public function test_can_create_{{class_name_lower}}(): void
+    {
+        $this->commandHandler
+            ->expects($this->once())
+            ->method('handleCreate');
+
+        $this->service->create{{class_name}}('Test {{class_name}}', 'Test Description');
+    }
+
+    public function test_can_update_{{class_name_lower}}(): void
+    {
+        $this->commandHandler
+            ->expects($this->once())
+            ->method('handleUpdate');
+
+        $this->service->update{{class_name}}('test-id', 'Updated {{class_name}}', 'Updated Description');
+    }
+
+    public function test_can_delete_{{class_name_lower}}(): void
+    {
+        $this->commandHandler
+            ->expects($this->once())
+            ->method('handleDelete');
+
+        $this->service->delete{{class_name}}('test-id');
+    }
+
+    public function test_can_get_{{class_name_lower}}_by_id(): void
+    {
+        $expectedDto = new {{class_name}}DTO(
+            'test-id',
+            'Test {{class_name}}',
+            'Test Description',
+            '2023-01-01 00:00:00',
+            '2023-01-01 00:00:00'
+        );
+
+        $this->queryHandler
+            ->expects($this->once())
+            ->method('handleGetById')
+            ->willReturn($expectedDto);
+
+        $result = $this->service->get{{class_name}}ById('test-id');
+
+        $this->assertEquals($expectedDto, $result);
+    }
+
+    public function test_can_get_all_{{class_name_lower}}s(): void
+    {
+        $expectedDtos = [
+            new {{class_name}}DTO('1', 'Test 1', 'Desc 1', '2023-01-01 00:00:00', '2023-01-01 00:00:00'),
+            new {{class_name}}DTO('2', 'Test 2', 'Desc 2', '2023-01-01 00:00:00', '2023-01-01 00:00:00'),
+        ];
+
+        $this->queryHandler
+            ->expects($this->once())
+            ->method('handleGetAll')
+            ->willReturn($expectedDtos);
+
+        $result = $this->service->getAll{{class_name}}s();
+
+        $this->assertEquals($expectedDtos, $result);
+    }
+
+    public function test_can_search_{{class_name_lower}}s(): void
+    {
+        $criteria = ['name' => 'Test'];
+        $expectedDtos = [
+            new {{class_name}}DTO('1', 'Test 1', 'Desc 1', '2023-01-01 00:00:00', '2023-01-01 00:00:00'),
+        ];
+
+        $this->queryHandler
+            ->expects($this->once())
+            ->method('handleSearch')
+            ->willReturn($expectedDtos);
+
+        $result = $this->service->search{{class_name}}s($criteria);
+
+        $this->assertEquals($expectedDtos, $result);
+    }
+} 

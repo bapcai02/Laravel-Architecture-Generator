@@ -1,0 +1,112 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use Illuminate\Http\Request;
+use {{service_interface_namespace}}\{{service_interface_name}};
+use App\Http\Requests\Store{{class_name}}Request;
+use App\Http\Requests\Update{{class_name}}Request;
+
+class {{class_name}}Controller extends Controller
+{
+    protected ${{class_name_lower}}Service;
+
+    public function __construct({{service_interface_name}} ${{class_name_lower}}Service)
+    {
+        $this->{{class_name_lower}}Service = ${{class_name_lower}}Service;
+    }
+
+    /**
+     * Display a listing of {{class_name_lower}}s
+     */
+    public function index(Request $request)
+    {
+        $filters = $request->all();
+        ${{class_name_lower}}s = $this->{{class_name_lower}}Service->getAll($filters);
+        
+        return response()->json([
+            'success' => true,
+            'data' => ${{class_name_lower}}s,
+            'count' => $this->{{class_name_lower}}Service->count($filters)
+        ]);
+    }
+
+    /**
+     * Store a newly created {{class_name_lower}}
+     */
+    public function store(Store{{class_name}}Request $request)
+    {
+        $data = $request->validated();
+
+        ${{class_name_lower}} = $this->{{class_name_lower}}Service->create($data);
+        
+        return response()->json([
+            'success' => true,
+            'data' => ${{class_name_lower}},
+            'message' => '{{class_name}} created successfully'
+        ], 201);
+    }
+
+    /**
+     * Display the specified {{class_name_lower}}
+     */
+    public function show(int $id)
+    {
+        ${{class_name_lower}} = $this->{{class_name_lower}}Service->findById($id);
+        
+        if (!${{class_name_lower}}) {
+            return response()->json([
+                'success' => false,
+                'message' => '{{class_name}} not found'
+            ], 404);
+        }
+        
+        return response()->json([
+            'success' => true,
+            'data' => ${{class_name_lower}}
+        ]);
+    }
+
+    /**
+     * Update the specified {{class_name_lower}}
+     */
+    public function update(Update{{class_name}}Request $request, int $id)
+    {
+        $data = $request->validated();
+
+        ${{class_name_lower}} = $this->{{class_name_lower}}Service->update($id, $data);
+        
+        if (!${{class_name_lower}}) {
+            return response()->json([
+                'success' => false,
+                'message' => '{{class_name}} not found'
+            ], 404);
+        }
+        
+        return response()->json([
+            'success' => true,
+            'data' => ${{class_name_lower}},
+            'message' => '{{class_name}} updated successfully'
+        ]);
+    }
+
+    /**
+     * Remove the specified {{class_name_lower}}
+     */
+    public function destroy(int $id)
+    {
+        $deleted = $this->{{class_name_lower}}Service->delete($id);
+        
+        if (!$deleted) {
+            return response()->json([
+                'success' => false,
+                'message' => '{{class_name}} not found or cannot be deleted'
+            ], 404);
+        }
+        
+        return response()->json([
+            'success' => true,
+            'message' => '{{class_name}} deleted successfully'
+        ]);
+    }
+} 

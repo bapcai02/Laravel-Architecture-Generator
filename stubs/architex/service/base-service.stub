@@ -2,527 +2,80 @@
 
 namespace {{namespace}};
 
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\Event;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Collection;
-use Exception;
-
 /**
- * Class BaseService
+ * {{class_name}} Service
  *
  * @package {{namespace}}
+ * @author {{author}}
+ * @since {{year}}
  */
-abstract class BaseService
+class {{class_name}}
 {
     /**
-     * @var RepositoryServiceInterface
+     * Create a new service instance.
      */
-    protected $repository;
+    public function __construct()
+    {
+        //
+    }
 
     /**
-     * @var string
-     */
-    protected $modelClass;
-
-    /**
-     * @var array
-     */
-    protected $cacheConfig = [
-        'enabled' => false,
-        'ttl' => 3600, // 1 hour
-        'prefix' => 'service_'
-    ];
-
-    /**
-     * @var array
-     */
-    protected $validationRules = [];
-
-    /**
-     * @var array
-     */
-    protected $searchableFields = [];
-
-    /**
-     * BaseService constructor.
+     * Get all {{model_name}} records.
      *
-     * @param RepositoryServiceInterface $repository
+     * @return \Illuminate\Database\Eloquent\Collection
      */
-    public function __construct(RepositoryServiceInterface $repository)
+    public function getAll()
     {
-        $this->repository = $repository;
-        $this->boot();
+        // Implementation here
+        return collect();
     }
 
     /**
-     * Boot the service
-     */
-    protected function boot()
-    {
-        // Override in child classes
-    }
-
-    /**
-     * Set model class
-     *
-     * @param string $modelClass
-     * @return $this
-     */
-    public function setModel(string $modelClass)
-    {
-        $this->modelClass = $modelClass;
-        $this->repository->model($modelClass);
-        return $this;
-    }
-
-    /**
-     * Get all records with caching
-     *
-     * @param array $columns
-     * @return mixed
-     */
-    public function all($columns = ['*'])
-    {
-        $cacheKey = $this->getCacheKey('all', $columns);
-        
-        return $this->cache()->remember($cacheKey, $this->cacheConfig['ttl'], function () use ($columns) {
-            return $this->repository->all($columns);
-        });
-    }
-
-    /**
-     * Find record by ID with caching
+     * Find {{model_name}} by ID.
      *
      * @param int $id
-     * @param array $columns
-     * @return mixed
+     * @return \{{model_namespace}}\{{model_name}}|null
      */
-    public function find($id, $columns = ['*'])
+    public function findById(int $id)
     {
-        $cacheKey = $this->getCacheKey('find', $id, $columns);
-        
-        return $this->cache()->remember($cacheKey, $this->cacheConfig['ttl'], function () use ($id, $columns) {
-            return $this->repository->find($id, $columns);
-        });
+        // Implementation here
+        return null;
     }
 
     /**
-     * Create new record with validation and events
+     * Create a new {{model_name}}.
      *
      * @param array $data
-     * @return mixed
+     * @return \{{model_namespace}}\{{model_name}}
      */
     public function create(array $data)
     {
-        try {
-            // Validate data
-            $this->validate($data, 'create');
-
-            // Fire creating event
-            Event::dispatch('service.creating', [$this, $data]);
-
-            DB::beginTransaction();
-
-            $result = $this->repository->create($data);
-
-            // Clear cache
-            $this->clearCache();
-
-            DB::commit();
-
-            // Fire created event
-            Event::dispatch('service.created', [$this, $result]);
-
-            return $result;
-
-        } catch (Exception $e) {
-            DB::rollBack();
-            Log::error('Service create error: ' . $e->getMessage(), [
-                'service' => get_class($this),
-                'data' => $data,
-                'exception' => $e
-            ]);
-            throw $e;
-        }
+        // Implementation here
+        return null;
     }
 
     /**
-     * Update record with validation and events
+     * Update {{model_name}}.
      *
      * @param int $id
      * @param array $data
-     * @return mixed
+     * @return \{{model_namespace}}\{{model_name}}|null
      */
-    public function update($id, array $data)
+    public function update(int $id, array $data)
     {
-        try {
-            // Validate data
-            $this->validate($data, 'update', $id);
-
-            // Fire updating event
-            Event::dispatch('service.updating', [$this, $id, $data]);
-
-            DB::beginTransaction();
-
-            $result = $this->repository->update($data, $id);
-
-            // Clear cache
-            $this->clearCache();
-
-            DB::commit();
-
-            // Fire updated event
-            Event::dispatch('service.updated', [$this, $result]);
-
-            return $result;
-
-        } catch (Exception $e) {
-            DB::rollBack();
-            Log::error('Service update error: ' . $e->getMessage(), [
-                'service' => get_class($this),
-                'id' => $id,
-                'data' => $data,
-                'exception' => $e
-            ]);
-            throw $e;
-        }
+        // Implementation here
+        return null;
     }
 
     /**
-     * Delete record with events
+     * Delete {{model_name}}.
      *
      * @param int $id
      * @return bool
      */
-    public function delete($id)
+    public function delete(int $id): bool
     {
-        try {
-            // Fire deleting event
-            Event::dispatch('service.deleting', [$this, $id]);
-
-            DB::beginTransaction();
-
-            $result = $this->repository->delete($id);
-
-            // Clear cache
-            $this->clearCache();
-
-            DB::commit();
-
-            // Fire deleted event
-            Event::dispatch('service.deleted', [$this, $id]);
-
-            return $result;
-
-        } catch (Exception $e) {
-            DB::rollBack();
-            Log::error('Service delete error: ' . $e->getMessage(), [
-                'service' => get_class($this),
-                'id' => $id,
-                'exception' => $e
-            ]);
-            throw $e;
-        }
-    }
-
-    /**
-     * Get paginated records
-     *
-     * @param int $perPage
-     * @param array $columns
-     * @return mixed
-     */
-    public function paginate($perPage = 15, $columns = ['*'])
-    {
-        return $this->repository->paginate($perPage, $columns);
-    }
-
-    /**
-     * Search records
-     *
-     * @param string $query
-     * @param array $fields
-     * @return mixed
-     */
-    public function search($query, array $fields = [])
-    {
-        $searchFields = empty($fields) ? $this->searchableFields : $fields;
-        $conditions = [];
-
-        foreach ($searchFields as $field) {
-            $conditions[$field] = ['LIKE', '%' . $query . '%'];
-        }
-
-        return $this->repository->findWhere($conditions);
-    }
-
-    /**
-     * Find records by criteria
-     *
-     * @param array $criteria
-     * @param array $columns
-     * @return mixed
-     */
-    public function findByCriteria(array $criteria, $columns = ['*'])
-    {
-        return $this->repository->findWhere($criteria, $columns);
-    }
-
-    /**
-     * Count records
-     *
-     * @param array $criteria
-     * @return int
-     */
-    public function count(array $criteria = [])
-    {
-        return $this->repository->count($criteria);
-    }
-
-    /**
-     * Get first record
-     *
-     * @param array $criteria
-     * @param array $columns
-     * @return mixed
-     */
-    public function first(array $criteria = [], $columns = ['*'])
-    {
-        if (empty($criteria)) {
-            return $this->repository->first($columns);
-        }
-
-        return $this->repository->findWhere($criteria, $columns)->first();
-    }
-
-    /**
-     * Get or create record
-     *
-     * @param array $criteria
-     * @param array $data
-     * @return mixed
-     */
-    public function firstOrCreate(array $criteria, array $data = [])
-    {
-        $record = $this->first($criteria);
-        
-        if (!$record) {
-            $record = $this->create(array_merge($criteria, $data));
-        }
-
-        return $record;
-    }
-
-    /**
-     * Update or create record
-     *
-     * @param array $criteria
-     * @param array $data
-     * @return mixed
-     */
-    public function updateOrCreate(array $criteria, array $data = [])
-    {
-        return $this->repository->updateOrCreate($criteria, $data);
-    }
-
-    /**
-     * Bulk create records
-     *
-     * @param array $records
-     * @return Collection
-     */
-    public function bulkCreate(array $records)
-    {
-        $results = collect();
-
-        DB::beginTransaction();
-
-        try {
-            foreach ($records as $record) {
-                $results->push($this->create($record));
-            }
-
-            DB::commit();
-            return $results;
-
-        } catch (Exception $e) {
-            DB::rollBack();
-            throw $e;
-        }
-    }
-
-    /**
-     * Bulk update records
-     *
-     * @param array $criteria
-     * @param array $data
-     * @return int
-     */
-    public function bulkUpdate(array $criteria, array $data)
-    {
-        return $this->repository->deleteWhere($criteria);
-    }
-
-    /**
-     * Bulk delete records
-     *
-     * @param array $criteria
-     * @return int
-     */
-    public function bulkDelete(array $criteria)
-    {
-        return $this->repository->deleteWhere($criteria);
-    }
-
-    /**
-     * Validate data
-     *
-     * @param array $data
-     * @param string $action
-     * @param int|null $id
-     * @return bool
-     */
-    protected function validate(array $data, $action = 'create', $id = null)
-    {
-        if (empty($this->validationRules)) {
-            return true;
-        }
-
-        $rules = $this->validationRules[$action] ?? $this->validationRules;
-
-        if ($id && isset($rules['id'])) {
-            $rules['id'] = 'required|exists:' . $this->modelClass . ',id';
-        }
-
-        $validator = validator($data, $rules);
-
-        if ($validator->fails()) {
-            throw new Exception('Validation failed: ' . $validator->errors()->first());
-        }
-
-        return true;
-    }
-
-    /**
-     * Get cache instance
-     *
-     * @return \Illuminate\Cache\CacheManager
-     */
-    protected function cache()
-    {
-        return $this->cacheConfig['enabled'] ? Cache::tags($this->getCacheTags()) : Cache::tags([]);
-    }
-
-    /**
-     * Get cache key
-     *
-     * @param string $method
-     * @param mixed ...$params
-     * @return string
-     */
-    protected function getCacheKey($method, ...$params)
-    {
-        $prefix = $this->cacheConfig['prefix'];
-        $service = class_basename($this);
-        $paramsHash = md5(serialize($params));
-        
-        return "{$prefix}{$service}_{$method}_{$paramsHash}";
-    }
-
-    /**
-     * Get cache tags
-     *
-     * @return array
-     */
-    protected function getCacheTags()
-    {
-        return [
-            'service',
-            class_basename($this),
-            $this->modelClass
-        ];
-    }
-
-    /**
-     * Clear cache
-     */
-    protected function clearCache()
-    {
-        if ($this->cacheConfig['enabled']) {
-            Cache::tags($this->getCacheTags())->flush();
-        }
-    }
-
-    /**
-     * Enable caching
-     *
-     * @param int $ttl
-     * @return $this
-     */
-    public function enableCache($ttl = 3600)
-    {
-        $this->cacheConfig['enabled'] = true;
-        $this->cacheConfig['ttl'] = $ttl;
-        return $this;
-    }
-
-    /**
-     * Disable caching
-     *
-     * @return $this
-     */
-    public function disableCache()
-    {
-        $this->cacheConfig['enabled'] = false;
-        return $this;
-    }
-
-    /**
-     * Set validation rules
-     *
-     * @param array $rules
-     * @return $this
-     */
-    public function setValidationRules(array $rules)
-    {
-        $this->validationRules = $rules;
-        return $this;
-    }
-
-    /**
-     * Set searchable fields
-     *
-     * @param array $fields
-     * @return $this
-     */
-    public function setSearchableFields(array $fields)
-    {
-        $this->searchableFields = $fields;
-        return $this;
-    }
-
-    /**
-     * Get repository instance
-     *
-     * @return RepositoryServiceInterface
-     */
-    public function getRepository()
-    {
-        return $this->repository;
-    }
-
-    /**
-     * Magic method to call repository methods
-     *
-     * @param string $method
-     * @param array $arguments
-     * @return mixed
-     */
-    public function __call($method, $arguments)
-    {
-        return call_user_func_array([$this->repository, $method], $arguments);
+        // Implementation here
+        return false;
     }
 } 

@@ -1,0 +1,51 @@
+<?php
+
+namespace {{namespace}}\Domain\Repositories;
+
+use {{namespace}}\Domain\Entities\{{class_name}};
+use {{namespace}}\Domain\ValueObjects\{{class_name}}Id;
+
+/**
+ * {{class_name}} Repository Interface
+ *
+ * @package {{namespace}}\Domain\Repositories
+ * @author {{author}}
+ * @since {{year}}
+ */
+interface {{class_name}}RepositoryInterface
+{
+    /**
+     * Find by ID
+     */
+    public function findById({{class_name}}Id $id): ?{{class_name}};
+
+    /**
+     * Find all
+     */
+    public function findAll(): array;
+
+    /**
+     * Find by criteria
+     */
+    public function findByCriteria(array $criteria): array;
+
+    /**
+     * Save entity
+     */
+    public function save({{class_name}} ${{class_name_lower}}): void;
+
+    /**
+     * Delete entity
+     */
+    public function delete({{class_name}}Id $id): void;
+
+    /**
+     * Check if exists
+     */
+    public function exists({{class_name}}Id $id): bool;
+
+    /**
+     * Count total
+     */
+    public function count(): int;
+} 

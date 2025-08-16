@@ -1,6 +1,6 @@
 # Laravel Architex Installation Guide
 
-Hướng dẫn cài đặt Laravel Architex từ đầu, bao gồm cả việc tạo test Laravel app.
+Complete installation guide for Laravel Architex from scratch, including creating a test Laravel application.
 
 ## 🚀 Prerequisites
 
@@ -130,10 +130,10 @@ chmod +x install-extensions.sh
 ### 1. Test All Commands
 
 ```bash
-# Test Repository Pattern
-php artisan make:repository User
+# Test Repository Pattern (with service layer)
+php artisan make:repository User --service
 
-# Test Service Layer
+# Test Service Layer (separate)
 php artisan make:service User
 
 # Test DDD Structure
@@ -199,10 +199,18 @@ After running test commands, you'll have:
 ```
 app/
 ├── Repositories/
-│   ├── Interfaces/UserRepositoryInterface.php
-│   └── UserRepository.php
+│   ├── Base/
+│   │   └── BaseRepository.php          # Trait with common methods
+│   ├── Interfaces/
+│   │   └── UserRepositoryInterface.php # Repository contract
+│   ├── UserRepository.php              # Implementation + trait usage
+│   └── RepositoryServiceProvider.php   # Repository bindings
 ├── Services/
-│   └── UserService.php
+│   ├── Interfaces/
+│   │   └── UserServiceInterface.php    # Service contract
+│   ├── Implementations/
+│   │   └── UserService.php             # Service implementation
+│   └── ServiceServiceProvider.php      # Service bindings
 ├── Domain/UserManagement/
 │   ├── Entities/
 │   ├── Repositories/

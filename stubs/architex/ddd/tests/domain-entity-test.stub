@@ -1,0 +1,90 @@
+<?php
+
+namespace {{namespace}}\Tests\Domain;
+
+use PHPUnit\Framework\TestCase;
+use {{namespace}}\Domain\Entities\{{class_name}};
+use {{namespace}}\Domain\ValueObjects\{{class_name}}Id;
+
+/**
+ * {{class_name}} Domain Entity Test
+ *
+ * @package {{namespace}}\Tests\Domain
+ * @author {{author}}
+ * @since {{year}}
+ */
+class {{class_name}}Test extends TestCase
+{
+    public function test_can_create_{{class_name_lower}}(): void
+    {
+        $id = {{class_name}}Id::generate();
+        ${{class_name_lower}} = new {{class_name}}($id, 'Test {{class_name}}', 'Test Description');
+
+        $this->assertEquals($id, ${{class_name_lower}}->getId());
+        $this->assertEquals('Test {{class_name}}', ${{class_name_lower}}->getName());
+        $this->assertEquals('Test Description', ${{class_name_lower}}->getDescription());
+        $this->assertTrue(${{class_name_lower}}->isValid());
+    }
+
+    public function test_can_change_name(): void
+    {
+        $id = {{class_name}}Id::generate();
+        ${{class_name_lower}} = new {{class_name}}($id, 'Old Name', 'Description');
+
+        ${{class_name_lower}}->changeName('New Name');
+
+        $this->assertEquals('New Name', ${{class_name_lower}}->getName());
+    }
+
+    public function test_cannot_set_empty_name(): void
+    {
+        $this->expectException(\InvalidArgumentException::class);
+
+        $id = {{class_name}}Id::generate();
+        ${{class_name_lower}} = new {{class_name}}($id, 'Valid Name', 'Description');
+        ${{class_name_lower}}->changeName('');
+    }
+
+    public function test_can_change_description(): void
+    {
+        $id = {{class_name}}Id::generate();
+        ${{class_name_lower}} = new {{class_name}}($id, 'Name', 'Old Description');
+
+        ${{class_name_lower}}->changeDescription('New Description');
+
+        $this->assertEquals('New Description', ${{class_name_lower}}->getDescription());
+    }
+
+    public function test_has_domain_events(): void
+    {
+        $id = {{class_name}}Id::generate();
+        ${{class_name_lower}} = new {{class_name}}($id, 'Test {{class_name}}', 'Description');
+
+        $events = ${{class_name_lower}}->getDomainEvents();
+
+        $this->assertNotEmpty($events);
+        $this->assertInstanceOf(\{{namespace}}\Domain\Events\{{class_name}}Created::class, $events[0]);
+    }
+
+    public function test_can_clear_domain_events(): void
+    {
+        $id = {{class_name}}Id::generate();
+        ${{class_name_lower}} = new {{class_name}}($id, 'Test {{class_name}}', 'Description');
+
+        ${{class_name_lower}}->clearDomainEvents();
+
+        $this->assertEmpty(${{class_name_lower}}->getDomainEvents());
+    }
+
+    public function test_can_convert_to_array(): void
+    {
+        $id = {{class_name}}Id::generate();
+        ${{class_name_lower}} = new {{class_name}}($id, 'Test {{class_name}}', 'Description');
+
+        $array = ${{class_name_lower}}->toArray();
+
+        $this->assertEquals($id->getValue(), $array['id']);
+        $this->assertEquals('Test {{class_name}}', $array['name']);
+        $this->assertEquals('Description', $array['description']);
+    }
+} 

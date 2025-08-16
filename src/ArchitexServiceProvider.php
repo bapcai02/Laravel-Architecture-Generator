@@ -13,7 +13,7 @@ use LaravelArchitex\Console\Commands\MakeCQRSCommand;
 use LaravelArchitex\Console\Commands\MakeModularCommand;
 use LaravelArchitex\Console\Commands\MakeHexagonalCommand;
 use LaravelArchitex\Services\ArchitectureGenerator;
-use LaravelArchitex\Services\TemplateEngine;
+use LaravelArchitex\Services\SimpleTemplateEngine;
 
 class ArchitexServiceProvider extends ServiceProvider
 {
@@ -27,7 +27,7 @@ class ArchitexServiceProvider extends ServiceProvider
         );
 
         $this->app->singleton(ArchitectureGenerator::class);
-        $this->app->singleton(TemplateEngine::class);
+        $this->app->singleton(SimpleTemplateEngine::class);
     }
 
     /**

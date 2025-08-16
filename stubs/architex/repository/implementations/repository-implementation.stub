@@ -2,46 +2,35 @@
 
 namespace {{namespace}};
 
+use {{interface_namespace}}\{{interface_name}};
+use {{model_namespace}}\{{model_name}};
 use {{base_namespace}}\BaseRepository;
-use {{interface_namespace}};
 
 /**
  * Class {{class_name}}
  *
  * @package {{namespace}}
+ * @author {{author}}
+ * @since {{year}}
+ * 
+ * @method array getAll(array $filters = [])
+ * @method object|null findById(int $id)
+ * @method object create(array $data)
+ * @method object|null update(int $id, array $data)
+ * @method bool delete(int $id)
+ * @method bool exists(int $id)
+ * @method int count(array $filters = [])
+ * @method object|null findBy(string $field, $value)
+ * @method array findByCriteria(array $criteria)
+ * @method \Illuminate\Pagination\LengthAwarePaginator paginate(int $perPage = 15, array $filters = [])
  */
-class {{class_name}} extends BaseRepository implements {{interface_name}}
+class {{class_name}} implements {{interface_name}}
 {
-    /**
-     * Specify Model class name
-     *
-     * @return string
-     */
-    public function model()
-    {
-        return \{{model_namespace}}\{{model_name}}::class;
-    }
+    use BaseRepository;
 
-    /**
-     * Boot the repository
-     */
-    public function boot()
+    public function __construct({{model_name}} $model)
     {
-        // Add any custom initialization logic here
-    }
-
-    /**
-     * Get searchable fields
-     *
-     * @return array
-     */
-    public function getFieldsSearchable()
-    {
-        return [
-            'name',
-            'email',
-            // Add more searchable fields as needed
-        ];
+        $this->initialize($model);
     }
 
     /**
@@ -52,17 +41,6 @@ class {{class_name}} extends BaseRepository implements {{interface_name}}
      */
     public function findByEmail($email)
     {
-        return $this->findByField('email', $email);
-    }
-
-    /**
-     * Custom method example with criteria
-     *
-     * @param array $criteria
-     * @return mixed
-     */
-    public function findByCriteria(array $criteria)
-    {
-        return $this->findWhere($criteria);
+        return $this->model->where('email', $email)->first();
     }
 } 
