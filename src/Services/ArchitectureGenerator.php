@@ -344,7 +344,8 @@ class ArchitectureGenerator
         $listenerContent = $this->templateEngine->render('event-bus/listeners/listener.stub', [
             'namespace' => $config['listeners']['namespace'],
             'class_name' => $listenerName,
-            'event_name' => $eventName,
+            // Ensure stub receives the exact event class name it expects
+            'event_class' => $eventName,
             'event_namespace' => $config['events']['namespace'],
             'model_name' => $name,
         ]);

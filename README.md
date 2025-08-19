@@ -478,11 +478,12 @@ php artisan make:cqrs CreateUser --force
 ### 5. Event Bus
 
 ```bash
-# Create event and listener
-php artisan make:event UserCreated
+# Option A: Create both event and listener (recommended)
+php artisan architex:event-bus UserCreated
 
-# Overwrite existing files
-php artisan make:event UserCreated --force
+# Option B: Use Laravel defaults (create separately)
+php artisan make:event UserCreatedEvent
+php artisan make:listener UserCreatedListener --event="App\\Events\\UserCreatedEvent"
 ```
 
 **Result:**
