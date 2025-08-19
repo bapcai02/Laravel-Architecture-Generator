@@ -142,8 +142,12 @@ php artisan make:ddd UserManagement
 # Test CQRS Pattern
 php artisan make:cqrs CreateUser
 
-# Test Event Bus
-php artisan make:event UserCreated
+# Test Event Bus (recommended)
+php artisan architex:event-bus UserCreated
+
+# Or using Laravel defaults
+php artisan make:event UserCreatedEvent
+php artisan make:listener UserCreatedListener --event="App\\Events\\UserCreatedEvent"
 ```
 
 ### 2. Run Comprehensive Test

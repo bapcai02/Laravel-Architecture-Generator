@@ -6,6 +6,7 @@ use Illuminate\Support\ServiceProvider;
 use LaravelArchitex\Console\Commands\MakeRepositoryCommand;
 use LaravelArchitex\Console\Commands\MakeServiceCommand;
 use LaravelArchitex\Console\Commands\MakeEventCommand;
+use LaravelArchitex\Console\Commands\MakeEventBusCommand;
 use LaravelArchitex\Console\Commands\MakeCommandCommand;
 use LaravelArchitex\Console\Commands\MakeQueryCommand;
 use LaravelArchitex\Console\Commands\MakeDDDCommand;
@@ -40,6 +41,7 @@ class ArchitexServiceProvider extends ServiceProvider
                 MakeRepositoryCommand::class,
                 MakeServiceCommand::class,
                 MakeEventCommand::class,
+                MakeEventBusCommand::class,
                 MakeCommandCommand::class,
                 MakeQueryCommand::class,
                 MakeDDDCommand::class,
